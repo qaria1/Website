@@ -9,7 +9,6 @@ use App\Traits\CommonTrait;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use App\Traits\PaginatorTrait;
-use App\Models\BusinessSetting;
 use App\Models\SubscriptionPlan;
 use App\Models\TrialPlanSetting;
 use App\Exports\SellerListExport;
@@ -33,6 +32,7 @@ use App\Contracts\Repositories\VendorRepositoryInterface;
 use App\Contracts\Repositories\ProductRepositoryInterface;
 use App\Enums\ExportFileNames\Admin\Vendor as VendorExport;
 use App\Contracts\Repositories\DeliveryManRepositoryInterface;
+use App\Contracts\Repositories\DealOfTheDayRepositoryInterface;
 use App\Contracts\Repositories\VendorWalletRepositoryInterface;
 use App\Contracts\Repositories\DeliveryZipCodeRepositoryInterface;
 use App\Contracts\Repositories\ShippingAddressRepositoryInterface;
@@ -56,6 +56,7 @@ class VendorController extends BaseController
         private readonly DeliveryZipCodeRepositoryInterface $deliveryZipCodeRepo,
         private readonly WithdrawRequestRepositoryInterface $withdrawRequestRepo,
         private readonly VendorWalletRepositoryInterface $vendorWalletRepo,
+        private readonly DealOfTheDayRepositoryInterface     $dealOfTheDayRepo,
     ) {
     }
 
@@ -79,6 +80,7 @@ class VendorController extends BaseController
             'status' => $request['status'] ? ($request['status'] == 'approved' ? 'approved' : ['rejected', 'suspended']) : [],
             'billing_id' => $request['billing_id'],
             'subscription_plan_id' => $request['subscription_plan_id'],
+            'sort_by' => $request['sort_by']
         ];
 
         $sellers = $this->vendorRepo->getListWhere(
@@ -91,16 +93,16 @@ class VendorController extends BaseController
 
         $request->flash();
 
-        return view(Vendor::LIST[VIEW], compact('sellers', 'current_date', 'subscriptionPlans'));
+        $sort_by = $request['sort_by'];
+
+        return view(Vendor::LIST[VIEW], compact('sellers', 'current_date', 'subscriptionPlans','sort_by'));
     }
 
     public function getAddView(Request $request): View
     {
         $subscriptionPlans = DB::table('subscription_plans')->select()->get();
-        $defaultTrialPlan = BusinessSetting::where('type', 'trial_period')->first()->toArray();
-        $defaultTrialPlan['values'] = json_decode($defaultTrialPlan['value']);
+        $defaultTrialPlan = TrialPlanSetting::first();
 
-        $defaultTrialName = SubscriptionPlan::where('id', $defaultTrialPlan['values']?->plan_id)->first()?->name;
         $assignedBrands = [];
 
         $getAllSellers = Seller::all();
@@ -117,7 +119,7 @@ class VendorController extends BaseController
 
         $brands = Brand::whereNotIn('id', $assignedBrands)->get();
 
-        return view(Vendor::ADD[VIEW], compact('subscriptionPlans', 'defaultTrialPlan', 'brands', 'defaultTrialName'));
+        return view(Vendor::ADD[VIEW], compact('subscriptionPlans', 'defaultTrialPlan', 'brands'));
     }
 
     public function updateStatus(Request $request): RedirectResponse
@@ -342,7 +344,13 @@ class VendorController extends BaseController
             relations: ['translations'],
             dataLimit: getWebConfig(name: WebConfigKey::PAGINATION_LIMIT)
         );
-        return view(Vendor::VIEW_PRODUCT[VIEW], compact('seller', 'products'));
+
+        $deals = $this->dealOfTheDayRepo->getListWhere(
+            orderBy: ['id'=>'desc'],
+            searchValue: $request['searchValue'],
+            dataLimit: getWebConfig('pagination_limit')
+        );
+        return view(Vendor::VIEW_PRODUCT[VIEW], compact('seller', 'products','deals'));
     }
 
     public function getSettingListTabView(Request $request, $seller, $id): View
@@ -464,20 +472,17 @@ class VendorController extends BaseController
         ->groupBy('plan_id')
         ->get();
 
-        $seller_subscription = SellerSubscription::where('seller_id', $seller->id)->with(['billingType', 'plan'])->latest()->first();
-        $total_bill = \App\Models\SubscriptionTransaction::where('seller_id', $seller->id)->where('plan_id', $seller_subscription->plan_id)->sum('paid_amount') ?? 0;
-
         $defaultTrialPlan = TrialPlanSetting::first();
 
         $request->flash();
 
-        return view(Vendor::VIEW_SUBSCRIPTION[VIEW], compact('seller', 'brands', 'defaultTrialPlan', 'subscriptionPlans', 'subscriptionHistory', 'seller_subscription', 'total_bill'));
+        return view(Vendor::VIEW_SUBSCRIPTION[VIEW], compact('seller', 'brands', 'defaultTrialPlan', 'subscriptionPlans', 'subscriptionHistory'));
     }
     public function getWithdrawView($withdraw_id, $seller_id): View|RedirectResponse
     {
         $withdrawRequest = $this->withdrawRequestRepo->getFirstWhere(params: ['id' => $withdraw_id], relations: ['seller']);
         if ($withdrawRequest) {
-            $withdrawalMethod = json_decode($withdrawRequest['withdrawal_method_fields'], true);
+            $withdrawalMethod = is_array($withdrawRequest['withdrawal_method_fields']) ? $withdrawRequest['withdrawal_method_fields'] : json_decode($withdrawRequest['withdrawal_method_fields']);
             $direction = session('direction');
             return view(Vendor::WITHDRAW_VIEW[VIEW], compact('withdrawRequest', 'withdrawalMethod', 'direction'));
         }

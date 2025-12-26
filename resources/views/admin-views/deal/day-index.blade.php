@@ -68,7 +68,7 @@
                                                 </div>
                                                 <div
                                                     class="d-flex flex-column gap-3 max-h-40vh overflow-y-auto overflow-x-hidden search-result-box">
-                                                    @include('admin-views.partials._search-product',['products'=>$products])
+                                                    <!-- @include('admin-views.partials._search-product',['products'=>$products]) -->
                                                 </div>
                                             </div>
                                         </div>
@@ -196,6 +196,9 @@
 @endsection
 
 @push('script')
+    <script>
+        window.searchProductRoute = "{{ route('admin.products.search-product-for-deal-of-the-day') }}";
+    </script>
     <script src="{{asset('public/assets/back-end/js/search-product.js')}}"></script>
     <script src="{{asset('public/assets/back-end/js/admin/deal.js')}}"></script>
 @endpush

@@ -239,6 +239,8 @@ Route::group(['prefix' => 'admin', 'as' => 'admin.', 'middleware' => ['admin']],
             Route::post(Product::DENY[URI], 'deny')->name('deny');
             Route::get(Product::APPROVE_STATUS[URI], 'approveStatus')->name('approve-status');
             Route::get(Product::SEARCH[URI], 'getSearchedProductsView')->name('search-product');
+            Route::get(Product::SEARCH_DEAL[URI], 'getSearchedProductsViewForDealOfTheDay')->name('search-product-for-deal-of-the-day');
+
         });
     });
 

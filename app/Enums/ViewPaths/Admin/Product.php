@@ -113,4 +113,7 @@ enum Product
         VIEW => 'admin-views.partials._search-product'
 
     ];
+    const SEARCH_DEAL = [
+        URI => 'search-deal',
+    ];
 }

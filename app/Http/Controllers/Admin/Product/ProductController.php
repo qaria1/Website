@@ -552,4 +552,21 @@ class ProductController extends BaseController
             'result' => view(Product::SEARCH[VIEW], compact('products'))->render(),
         ]);
     }
+    public function getSearchedProductsViewForDealOfTheDay(Request $request): JsonResponse
+    {
+        $searchValue = $request['searchValue'] ?? null;
+        $products = $this->productRepo->getListWhere(
+            searchValue: $searchValue,
+            filters: [
+                'status' => 1,
+                'category_id' => $request['category_id'],
+                'code' => $request['name'],
+            ],
+            dataLimit: getWebConfig(name: 'pagination_limit')
+        );
+        return response()->json([
+            'count' => $products->count(),
+            'result' => view(Product::SEARCH[VIEW], compact('products'))->render(),
+        ]);
+    }
 }
