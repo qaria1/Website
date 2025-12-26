@@ -51,8 +51,8 @@
                 <div class="d-flex flex-wrap gap-3 justify-content-between">
                     <div class="media flex-column flex-sm-row gap-3">
                         <img class="avatar avatar-170 rounded-0"
-                             src="{{ getValidImage(path: 'storage/app/public/shop/'.$seller?->shop->image, type: 'backend-basic') }}"
-                             alt="{{translate('image')}}">
+                            src="{{ getValidImage(path: 'storage/shop/' . $seller?->shop->image, type: 'backend-basic') }}"
+                            alt="{{ translate('image') }}">
                         <div class="media-body">
                             @if (
                                 $seller?->shop->temporary_close ||
@@ -74,7 +74,7 @@
                             @endif
                             <div class="d-block">
                                 <h2 class="mb-2 pb-1">
-                                    {{ $seller->shop ? $seller?->shop?->name : translate('shop_Name') . ' : ' . translate('update_Please') }}
+                                    {{ $seller->shop ? $seller->shop->name : translate('shop_Name') . ' : ' . translate('update_Please') }}
                                 </h2>
                                 <div class="d-flex gap-3 flex-wrap mb-3 lh-1">
                                     <div
@@ -370,7 +370,7 @@
                         </div>
                         <div class="col-lg-8">
                             <div class="row g-2">
-                                {{-- <div class="col-md-6">
+                                <div class="col-md-6">
                                     <div class="card card-body h-100 justify-content-center">
                                         <div class="d-flex gap-2 justify-content-between align-items-center">
                                             <div class="d-flex flex-column align-items-start">
@@ -387,7 +387,7 @@
                                             </div>
                                         </div>
                                     </div>
-                                </div> --}}
+                                </div>
                                 <div class="col-12">
                                     <div class="card card-body h-100 justify-content-center">
                                         <div class="d-flex gap-2 justify-content-between align-items-center">
@@ -406,7 +406,7 @@
                                         </div>
                                     </div>
                                 </div>
-                                {{-- <div class="col-md-6">
+                                <div class="col-md-6">
                                     <div class="card card-body h-100 justify-content-center">
                                         <div class="d-flex gap-2 justify-content-between align-items-center">
                                             <div class="d-flex flex-column align-items-start">
@@ -423,7 +423,7 @@
                                             </div>
                                         </div>
                                     </div>
-                                </div> --}}
+                                </div>
                                 {{-- <div class="col-md-6">
                                     <div class="card card-body h-100 justify-content-center">
                                         <div class="d-flex gap-2 justify-content-between align-items-center">
@@ -459,7 +459,7 @@
                                         </div>
                                     </div>
                                 </div> --}}
-                                {{-- <div class="col-md-6">
+                                <div class="col-md-6">
                                     <div class="card card-body h-100 justify-content-center">
                                         <div class="d-flex gap-2 justify-content-between align-items-center">
                                             <div class="d-flex flex-column align-items-start">
@@ -475,7 +475,7 @@
                                             </div>
                                         </div>
                                     </div>
-                                </div> --}}
+                                </div>
                             </div>
                         </div>
                     </div>

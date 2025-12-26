@@ -260,6 +260,6 @@
 @endsection
 
 @push('script')
-    <script src="{{dynamicAsset('public/public/assets/back-end/js/admin/chatting.js')}}"></script>
+    <script src="{{dynamicAsset('public/assets/back-end/js/admin/chatting.js')}}"></script>
 @endpush
 

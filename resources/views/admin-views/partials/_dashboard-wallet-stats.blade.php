@@ -24,7 +24,7 @@
                 </div>
             </div>
         </div>
-        {{-- <div class="col-md-6">
+        <div class="col-md-6">
             <div class="card card-body h-100 justify-content-center">
                 <div class="d-flex gap-2 justify-content-between align-items-center">
                     <div class="d-flex flex-column align-items-start">
@@ -36,7 +36,7 @@
                     </div>
                 </div>
             </div>
-        </div> --}}
+        </div>
         {{-- <div class="col-md-6">
             <div class="card card-body h-100 justify-content-center">
                 <div class="d-flex gap-2 justify-content-between align-items-center">
@@ -50,7 +50,8 @@
                 </div>
             </div>
         </div>
-        <div class="col-md-6">
+        --}}
+         <div class="col-md-6">
             <div class="card card-body h-100 justify-content-center">
                 <div class="d-flex gap-2 justify-content-between align-items-center">
                     <div class="d-flex flex-column align-items-start">
@@ -62,6 +63,6 @@
                     </div>
                 </div>
             </div>
-        </div> --}}
+        </div>
     </div>
 </div>

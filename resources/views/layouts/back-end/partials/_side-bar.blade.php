@@ -1019,7 +1019,7 @@
                                 </ul>
                             </li> --}}
 
-                            {{-- @if (auth('admin')->user()->admin_role_id == 1)
+                             @if (auth('admin')->user()->admin_role_id == 1)
                                 <li
                                     class="navbar-vertical-aside-has-menu {{ Request::is('admin/employee*') || Request::is('admin/custom-role*') ? 'active' : '' }}">
                                     <a class="js-navbar-vertical-aside-menu-link nav-link nav-link-toggle"
@@ -1052,7 +1052,7 @@
                                         </li>
                                     </ul>
                                 </li>
-                            @endif --}}
+                            @endif
 
                             {{-- <li
                                 class="navbar-vertical-aside-has-menu {{ Request::is('admin/customer/' . Customer::SUBSCRIBER_LIST[URI]) ? 'active' : '' }}">
