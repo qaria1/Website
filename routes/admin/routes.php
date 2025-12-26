@@ -931,6 +931,9 @@ Route::group(['prefix' => 'admin', 'as' => 'admin.', 'middleware' => ['admin']],
             Route::controller(SellerSettingsController::class)->group(function () {
                 Route::get(BusinessSettings::SELLER_VIEW[URI], 'index')->name('index')->middleware('actch');
                 Route::post(BusinessSettings::SELLER_SETTINGS_UPDATE[URI], 'update')->name('update-seller-settings');
+                Route::post(BusinessSettings::COMMISSION_RULES_UPDATE[URI], 'commissionRulesUpdate')->name('update-commission-rules');
+                Route::put(BusinessSettings::COMMISSION_RULES_UPDATE[URI]. '/{id}', 'updateCommissionRule')->name('update-commission-rules.edit');
+                Route::delete(BusinessSettings::COMMISSION_RULES_UPDATE[URI]. '/{id}', 'deleteCommissionRule')->name('update-commission-rules.destroy');
             });
         });
 

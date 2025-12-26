@@ -83,5 +83,8 @@ enum BusinessSettings
         URI => '',
         VIEW => 'admin-views.business-settings.product-settings'
     ];
-
+    const COMMISSION_RULES_UPDATE = [
+        URI => 'commission-rules-update',
+        VIEW => ''
+    ];
 }

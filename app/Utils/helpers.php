@@ -30,6 +30,7 @@ use Illuminate\Support\Facades\App;
 use App\Models\AddFundBonusCategories;
 use App\Models\SubscriptionTransaction;
 use Illuminate\Support\Facades\Session;
+use App\Models\CommissionRule;
 
 class Helpers
 {
@@ -931,15 +932,39 @@ class Helpers
     public static function seller_sales_commission($seller_is, $seller_id, $order_total)
     {
         $commission_amount = 0;
-        if ($seller_is == 'seller') {
+
+        if ($seller_is === 'seller') {
             $seller = Seller::find($seller_id);
-            if (isset($seller) && $seller['sales_commission_percentage'] !== null) {
-                $commission = $seller['sales_commission_percentage'];
-            } else {
-                $commission = Helpers::get_business_settings('sales_commission');
+
+            if ($seller) {
+                $rule = CommissionRule::where('seller_id', $seller)
+                    ->where('min_price', '<=', $order_total)
+                    ->where(function ($q) use ($order_total) {
+                        $q->where('max_price', '>=', $order_total)
+                            ->orWhereNull('max_price');
+                    })
+                    ->orderBy('min_price', 'desc')
+                    ->first();
+
+                if ($rule) {
+                    $commission = $rule->commission_percent;
+                } else {
+                    $rule = CommissionRule::whereNull('seller_id')
+                        ->where('min_price', '<=', $order_total)
+                        ->where(function ($q) use ($order_total) {
+                            $q->where('max_price', '>=', $order_total)
+                                ->orWhereNull('max_price');
+                        })
+                        ->orderBy('min_price', 'desc')
+                        ->first();
+
+                    $commission = $rule->commission_percent ?? Helpers::get_business_settings('sales_commission');
+                }
+
+                $commission_amount = number_format(($order_total * $commission) / 100, 2);
             }
-            $commission_amount = number_format(($order_total / 100) * $commission, 2);
         }
+
         return $commission_amount;
     }
 
@@ -1495,5 +1520,35 @@ if (!function_exists('subscription_plan_chosen')) {
             return false;
         }
         return  $subscription_transaction_ID;
+    }
+}
+if (!function_exists('getCommissionPercent')) {
+    function getCommissionPercent($price, $sellerId = null)
+    {
+        if ($sellerId) {
+            $rule = CommissionRule::where('seller_id', $sellerId)
+                ->where('min_price', '<=', $price)
+                ->where(function ($q) use ($price) {
+                    $q->where('max_price', '>=', $price)
+                      ->orWhereNull('max_price');
+                })
+                ->orderBy('min_price', 'desc')
+                ->first();
+
+            if ($rule) {
+                return $rule->commission_percent;
+            }
+        }
+
+        $rule = CommissionRule::whereNull('seller_id')
+            ->where('min_price', '<=', $price)
+            ->where(function ($q) use ($price) {
+                $q->where('max_price', '>=', $price)
+                  ->orWhereNull('max_price');
+            })
+            ->orderBy('min_price', 'desc')
+            ->first();
+
+        return $rule->commission_percent ?? 10;
     }
 }
