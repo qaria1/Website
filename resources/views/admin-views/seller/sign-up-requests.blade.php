@@ -1,0 +1,262 @@
+@php use Illuminate\Support\Str; @endphp
+@extends('layouts.back-end.app')
+
+@section('title', translate('vendor_List'))
+
+@section('content')
+    <div class="content container-fluid">
+        <div class="mb-4">
+            <h2 class="h1 mb-0 text-capitalize d-flex align-items-center gap-2">
+                <img src="{{asset('/public/assets/back-end/img/add-new-seller.png')}}" alt="">
+                {{translate('vendor_Sign_Up_Request_List')}}
+                <span class="badge badge-soft-dark radius-50 fz-12">{{ $sellers->total() }}</span>
+            </h2>
+        </div>
+        {{-- <div class="card">
+            <div class="card-body">
+                <form action="{{ url()->current() }}" method="GET">
+                    <input type="hidden" value="{{ request('status') }}" name="">
+                    <div class="row gx-2">
+                        <div class="col-12">
+                            <h4 class="mb-3">{{ translate('filter_vendors') }}</h4>
+                        </div>
+
+                        <div class="col-sm-6 col-lg-4 col-xl-3">
+                            <div class="form-group">
+                                <label for="name" class="title-color">{{ translate('subscription_plan') }}</label>
+                                <select class="js-select2-custom form-control action-get-billing-types"
+                                    name="subscription_plan_id" id="subscription-plan-select" data-url-prefix="{{ route('admin.subscriptions.get-billing-types') . '?plan_id=' }}"
+                                    data-element-id="billing-type-select" data-element-type="select">
+                                    <option
+                                        value="{{ request('subscription_plan_id') != null ? request('subscription_plan_id') : null }}"
+                                        {{ old('subscription_plan_id') == "" ? 'selected' : '' }} disabled>
+                                        {{ translate('select_plan') }}
+                                    </option>
+
+                                    @forelse ($subscriptionPlans as $plan)
+                                        <option value="{{ $plan->id }}" {{ old('subscription_plan_id') == $plan->id ? 'selected' : '' }}>{{ $plan->name }}</option>
+                                    @empty
+                                    @endforelse
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-sm-6 col-lg-4 col-xl-3">
+                            <div class="form-group">
+                                <label for="name" class="title-color">{{ translate('billing_type') }}</label>
+                                <select class="js-select2-custom form-control"
+                                    name="billing_id" id="billing-type-select" data-element-type="select">
+                                    <option
+                                        value="{{ request('billing_id') != null ? request('billing_id') : null }}"
+                                        selected {{ request('billing_id') != null ? '' : 'disabled' }}>
+                                        {{ translate('select_subscription_first') }}
+                                    </option>
+
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-sm-6 col-lg-4 col-xl-3">
+                            <div class="form-group">
+                                <label for="name" class="title-color">{{ translate('vendor_status') }}</label>
+                                <select class="js-select2-custom form-control" name="status"
+                                    id="status-select">
+                                    <option
+                                        value="{{ request('status-name') != null ? request('status-name') : null }}"
+                                        selected {{ request('status-name') != null ? '' : 'disabled' }}>
+                                        {{ translate('select_status') }}
+                                    </option>
+                                    <option value="approved" {{ old('status') == 'approved' ? 'selected' : '' }}>{{ translate('active') }}</option>
+                                    <option value="other" {{ old('status') == 'other' ? 'selected' : '' }}>{{ translate('inactive') }}</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-12">
+                            <div class="d-flex gap-3 justify-content-end">
+                                <a href="{{ route('admin.sellers.seller-list', ['type' => request('type')]) }}"
+                                    class="btn btn-secondary px-5">
+                                    {{ translate('reset') }}
+                                </a>
+                                <button type="submit" class="btn btn--primary px-5 action-get-element-type">
+                                    {{ translate('show_data') }}
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div> --}}
+        <div class="row mt-4">
+            <div class="col-md-12">
+                <div class="card">
+                    <div class="px-3 py-4">
+                        <div class="d-flex justify-content-between gap-10 flex-wrap align-items-center">
+                            <div class="">
+                                <form action="{{ url()->current() }}" method="GET">
+                                    <div class="input-group input-group-merge input-group-custom">
+                                        <div class="input-group-prepend">
+                                            <div class="input-group-text">
+                                                <i class="tio-search"></i>
+                                            </div>
+                                        </div>
+                                        <input id="datatableSearch_" type="search" name="searchValue" class="form-control"
+                                            placeholder="{{translate('search_by_Name_or_Phone_or_Email')}}" aria-label="Search orders" value="{{ request('searchValue') }}">
+                                        <button type="submit" class="btn btn--primary">{{translate('search')}}</button>
+                                    </div>
+                                </form>
+                            </div>
+                            <div class="d-flex justify-content-end gap-2">
+                                <div class="dropdown text-nowrap">
+                                    <button type="button" class="btn btn-outline--primary" data-toggle="dropdown">
+                                        <i class="tio-download-to"></i>
+                                        {{translate('export')}}
+                                        <i class="tio-chevron-down"></i>
+                                    </button>
+
+                                    <ul class="dropdown-menu dropdown-menu-right">
+                                        <li>
+                                            <a type="submit" class="dropdown-item d-flex align-items-center gap-2 " href="{{route('admin.sellers.sign-up-list-export-excel',['searchValue' => request('searchValue')])}}">
+                                                <img width="14" src="{{asset('/public/assets/back-end/img/excel.png')}}" alt="">
+                                                {{translate('excel')}}
+                                            </a>
+                                        </li>
+                                    </ul>
+                                </div>
+                                {{-- <a href="{{route('admin.sellers.seller-add')}}" type="button" class="btn btn--primary text-nowrap">
+                                    <i class="tio-add"></i>
+                                    {{translate('add_New_Vendor')}}
+                                </a> --}}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="table-responsive">
+                        <table
+                            style="text-align: {{Session::get('direction') === "rtl" ? 'right' : 'left'}};"
+                            class="table table-hover table-borderless table-thead-bordered table-nowrap table-align-middle card-table w-100">
+                            <thead class="thead-light thead-50 text-capitalize">
+                            <tr>
+                                <th>{{translate('SL')}}</th>
+                                <th>{{translate('shop_name')}}</th>
+                                <th>{{translate('vendor_name')}}</th>
+                                <th>{{translate('contact_info')}}</th>
+                                <th>{{translate('sex')}}</th>
+                                <th>{{translate('age')}}</th>
+                                {{-- <th>{{translate('status')}}</th> --}}
+                                {{-- <th class="text-center">{{translate('total_products')}}</th> --}}
+                                {{-- <th class="text-center">{{translate('total_orders')}}</th> --}}
+                                <th class="text-center">{{translate('action')}}</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            @foreach($sellers as $key=>$seller)
+                                <tr>
+                                    <td>{{$sellers->firstItem()+$key}}</td>
+                                    <td>
+                                        <div class="d-flex align-items-center gap-10 w-max-content">
+                                            <img width="50"
+                                            class="avatar rounded-circle" src="{{ getValidImage(path: 'storage/shop/'.$seller->shop->image, type: 'backend-basic') }}"
+                                                alt="">
+                                            <div>
+                                                <a class="title-color" href="{{ route('admin.sellers.view', ['id' => $seller->id]) }}">{{ Str::limit($seller?->shop?->name, 20)}}</a>
+                                                <br>
+                                                <span class="text-danger">
+                                                    @if($seller->shop->temporary_close)
+                                                        {{ translate('temporary_closed') }}
+                                                    @elseif($seller->shop->vacation_status && $current_date >= date('Y-m-d', strtotime($seller->shop->vacation_start_date)) && $current_date <= date('Y-m-d', strtotime($seller->shop->vacation_end_date)))
+                                                        {{ translate('on_vacation') }}
+                                                    @endif
+                                                </span>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        {{$seller->f_name}} {{$seller->l_name}}
+                                    </td>
+                                    <td>
+                                        <div class="mb-1">
+                                            <strong><a class="title-color hover-c1" href="mailto:{{$seller->email}}">{{$seller->email}}</a></strong>
+                                        </div>
+                                        <a class="title-color hover-c1" href="tel:{{$seller->phone}}">{{$seller->phone}}</a>
+                                    </td>
+                                    <td>
+                                        <span class="badge badge-soft-info">{{$seller->sex}}</span>
+                                    </td>
+                                    <td>
+                                        {{$seller->age}}
+                                    </td>
+                                    {{-- <td>
+                                        {!! $seller->status=='approved'?'<label class="badge badge-success">'.translate('active').'</label>':'<label class="badge badge-danger">'.translate('inactive').'</label>' !!}
+                                    </td> --}}
+                                    {{-- <td class="text-center">
+                                        <a href="{{route('admin.sellers.product-list',[$seller['id']])}}"
+                                           class="btn text--primary bg-soft--primary font-weight-bold px-3 py-1 mb-0 fz-12">
+                                            {{$seller->product->count()}}
+                                        </a>
+                                    </td> --}}
+                                    {{-- <td class="text-center">
+                                        <a href="{{route('admin.sellers.order-list',[$seller['id']])}}"
+                                            class="btn text-info bg-soft-info font-weight-bold px-3 py-1 fz-12 mb-0">
+                                            {{$seller->orders->where('seller_is','seller')->where('order_type','default_type')->count()}}
+                                        </a>
+                                    </td> --}}
+                                    <td>
+                                        <div class="d-flex justify-content-center gap-2">
+                                            <form class="d-inline-block" action="{{ route('admin.sellers.updateStatus') }}"
+                                                method="POST">
+                                                @csrf
+                                                <input type="hidden" name="id" value="{{ $seller->id }}">
+                                                <input type="hidden" name="status" value="approved">
+                                                <button type="submit"
+                                                    class="btn btn-success">{{ translate('approve_vendor') }}</button>
+                                            </form>
+                                        </div>
+                                    </td>
+                                </tr>
+                            @endforeach
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="table-responsive mt-4">
+                        <div class="px-4 d-flex justify-content-center justify-content-md-end">
+                            {!! $sellers->links() !!}
+                        </div>
+                    </div>
+                    @if(count($sellers)==0)
+                        <div class="text-center p-4">
+                            <img class="mb-3 w-160" src="{{asset('public/assets/back-end/svg/illustrations/sorry.svg')}}" alt="{{('image_description')}}">
+                            <p class="mb-0">{{translate('no_data_to_show')}}</p>
+                        </div>
+                    @endif
+                </div>
+            </div>
+        </div>
+    </div>
+@endsection
+@push('script')
+    <script>
+        $('.action-get-billing-types').on('change', function() {
+            let getUrlPrefix = $(this).data('url-prefix');
+            let id = $(this).data('element-id');
+            let getElementType = $(this).data('element-type');
+            let value = $(this).val();
+
+            // Ajax here to get billing types of the selected subscription plan
+            getPlanBillingTypes(getUrlPrefix, id, getElementType, value)
+
+        });
+
+        function getPlanBillingTypes(getUrlPrefix, id, getElementType, value) {
+            console.log(getUrlPrefix + value)
+            let message = $('#message-select-word').data('text');
+            $('#billing-type-select').empty().append(`<option value="" selected disabled>---` + message + `---</option>`);
+            $.get({
+                url: getUrlPrefix + value,
+                dataType: 'json',
+                success: function(data) {
+                    console.log(data);
+                    if (getElementType === 'select') {
+                        $('#' + id).empty().append(data.select_tag);
+                    }
+                },
+            });
+        }
+    </script>
+@endpush
