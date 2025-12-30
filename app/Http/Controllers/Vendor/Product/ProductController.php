@@ -216,8 +216,8 @@ class ProductController extends BaseController
         $lifetimeEndDate = isset($maxProductLifeTime) ? \Carbon\Carbon::now()->addDays((int)$maxProductLifeTime) : NULL;
 
         // 10% commission, product price will be displayed adding 105 of its price
-        $defaultCommission = getWebConfig(name: 'sales_commission');
-        $dataArray['unit_price'] = ($defaultCommission / 100) * $dataArray['unit_price'] + $dataArray['unit_price'];
+        // $defaultCommission = getWebConfig(name: 'sales_commission');
+        // $dataArray['unit_price'] = ($defaultCommission / 100) * $dataArray['unit_price'] + $dataArray['unit_price'];
 
         $dataArray['lifetime_end_date'] = $lifetimeEndDate;
         $savedProduct = $this->productRepo->add(data: $dataArray);
