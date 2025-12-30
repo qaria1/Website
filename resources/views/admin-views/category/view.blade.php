@@ -117,7 +117,7 @@
                                         <div class="custom-file text-left">
                                             <input type="file" name="image" id="category-image"
                                                 class="custom-file-input image-preview-before-upload" data-preview="#viewer"
-                                                accept=".jpg, .png, .jpeg, .gif, .bmp, .tif, .tiff|image/*" required>
+                                                accept=".jpg, .jpeg" required>
                                             <label class="custom-file-label"
                                                 for="category-image">{{ translate('choose_File') }}</label>
                                         </div>

@@ -58,7 +58,7 @@
                                 <div class="custom-file text-left">
                                     <input type="file" name="image" id="custom-file-upload"
                                         class="custom-file-input image-input" data-image-id="viewer"
-                                        accept=".jpg, .png, .jpeg, .gif, .bmp, .tif, .tiff|image/*">
+                                        accept=".jpg, .jpeg">
                                     <label class="custom-file-label"
                                         for="custom-file-upload">{{ translate('upload_image') }}</label>
                                 </div>
@@ -281,7 +281,7 @@
                                 <div class="custom-file">
                                     <input type="file" name="logo" id="logo-upload"
                                         class="custom-file-input image-input" data-image-id="viewerLogo"
-                                        accept=".jpg, .png, .jpeg, .gif, .bmp, .tif, .tiff|image/*">
+                                        accept=".jpg, .jpeg">
                                     <label class="custom-file-label"
                                         for="logo-upload">{{ translate('upload_logo') }}</label>
                                 </div>
@@ -303,7 +303,7 @@
                                 <div class="custom-file">
                                     <input type="file" name="banner" id="banner-upload"
                                         class="custom-file-input image-input" data-image-id="viewerBanner"
-                                        accept=".jpg, .png, .jpeg, .gif, .bmp, .tif, .tiff|image/*">
+                                        accept=".jpg, .jpeg">
                                     <label class="custom-file-label text-capitalize"
                                         for="banner-upload">{{ translate('upload_Banner') }}</label>
                                 </div>
@@ -328,7 +328,7 @@
                                     <div class="custom-file">
                                         <input type="file" name="bottom_banner" id="bottom-banner-upload"
                                             class="custom-file-input image-input" data-image-id="viewerBottomBanner"
-                                            accept=".jpg, .png, .jpeg, .gif, .bmp, .tif, .tiff|image/*">
+                                            accept=".jpg, .jpeg">
                                         <label class="custom-file-label text-capitalize"
                                             for="bottom-banner-upload">{{ translate('upload_bottom_banner') }}</label>
                                     </div>

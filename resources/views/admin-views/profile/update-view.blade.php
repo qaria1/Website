@@ -115,7 +115,7 @@
                                     <span class="d-block mb-2 text-info">( {{translate('ratio').' '.'1:1'}})</span>
                                     <div class="custom-file">
                                         <input type="file" name="image" id="custom-file-upload" data-image-id="viewer" class="custom-file-input  image-input"
-                                            accept=".jpg, .png, .jpeg, .gif, .bmp, .tif, .tiff|image/*">
+                                            accept=".jpg, .jpeg">
                                         <label class="custom-file-label text-capitalize" for="custom-file-upload">{{translate('image_upload')}}</label>
                                     </div>
                                 </div>

@@ -73,7 +73,7 @@
                                             <div class="custom-file text-left">
                                                 <input type="file" name="image" id="custom-file-upload" class="custom-file-input image-input"
                                                        data-image-id="viewer"
-                                                       accept=".jpg, .png, .jpeg, .gif, .bmp, .tif, .tiff|image/*" required>
+                                                       accept=".jpg, .jpeg" required>
                                                 <label class="custom-file-label" for="custom-file-upload">{{translate('choose_file')}}</label>
                                             </div>
                                         </div>

@@ -81,7 +81,7 @@
                                         <span class="text-info">* ( {{translate('ratio')}} 1:1 )</span>
                                         <div class="custom-file">
                                             <input value="{{ old('image') }}" type="file" name="image" id="customFileEg1" class="custom-file-input"
-                                                   accept=".jpg, .png, .jpeg, .gif, .bmp, .tif, .tiff|image/*" required>
+                                                   accept=".jpg, .jpeg" required>
                                             <label class="custom-file-label" for="customFileEg1">{{translate('choose_File')}}</label>
                                         </div>
                                         <div class="mt-4 text-center">

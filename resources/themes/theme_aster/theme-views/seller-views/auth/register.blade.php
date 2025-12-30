@@ -74,7 +74,7 @@
                                             <div class="col-12">
                                                 <div class="media gap-3 align-items-center">
                                                     <div class="upload-file">
-                                                        <input type="file" class="upload-file__input" name="image" accept=".jpg, .png, .jpeg, .gif, .bmp, .tif, .tiff|image/*" required>
+                                                        <input type="file" class="upload-file__input" name="image" accept=".jpg, .jpeg" required>
                                                         <div class="upload-file__img">
                                                             <div class="temp-img-box">
                                                                 <div class="d-flex align-items-center flex-column gap-2">
@@ -118,7 +118,7 @@
                                             <div class="col-lg-6 mb-4">
                                                 <div class="d-flex flex-column gap-3 align-items-center">
                                                     <div class="upload-file">
-                                                        <input type="file" class="upload-file__input" name="banner" accept=".jpg, .png, .jpeg, .gif, .bmp, .tif, .tiff|image/*" required>
+                                                        <input type="file" class="upload-file__input" name="banner" accept=".jpg, .jpeg" required>
                                                         <div class="upload-file__img style--two">
                                                             <div class="temp-img-box">
                                                                 <div class="d-flex align-items-center flex-column gap-2">
@@ -141,7 +141,7 @@
                                             <div class="col-lg-6 mb-4">
                                                 <div class="d-flex flex-column gap-3 align-items-center">
                                                     <div class="upload-file">
-                                                        <input type="file" class="upload-file__input" name="bottom_banner" accept=".jpg, .png, .jpeg, .gif, .bmp, .tif, .tiff|image/*" required>
+                                                        <input type="file" class="upload-file__input" name="bottom_banner" accept=".jpg, .jpeg" required>
                                                         <div class="upload-file__img style--two">
                                                             <div class="temp-img-box">
                                                                 <div class="d-flex align-items-center flex-column gap-2">
@@ -163,7 +163,7 @@
                                             <div class="col-lg-6 mb-4">
                                                 <div class="d-flex flex-column gap-3 align-items-center">
                                                     <div class="upload-file">
-                                                        <input type="file" class="upload-file__input" name="logo" accept=".jpg, .png, .jpeg, .gif, .bmp, .tif, .tiff|image/*" required>
+                                                        <input type="file" class="upload-file__input" name="logo" accept=".jpg, .jpeg" required>
                                                         <div class="upload-file__img">
                                                             <div class="temp-img-box">
                                                                 <div class="d-flex align-items-center flex-column gap-2">

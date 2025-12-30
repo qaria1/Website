@@ -66,7 +66,7 @@
                             <div class="custom-file mt-3">
                                 <input type="file" name="image" id="custom-file-upload" value="{{ old('image') }}"
                                     class="custom-file-input image-preview-before-upload" data-preview="#viewer"
-                                    accept=".jpg, .png, .jpeg, .gif, .bmp, .tif, .tiff|image/*">
+                                    accept=".jpg, .jpeg">
                                 <label class="custom-file-label"
                                     for="customFileUpload">{{ translate('upload_image') }}</label>
                             </div>
@@ -213,7 +213,7 @@
                                 <div class="custom-file">
                                     <input type="file" name="logo" id="Logo-upload"
                                         class="custom-file-input image-preview-before-upload" data-preview="#viewerLogo"
-                                        accept=".jpg, .png, .jpeg, .gif, .bmp, .tif, .tiff|image/*">
+                                        accept=".jpg, .jpeg">
                                     <label class="custom-file-label"
                                         for="Logo-upload">{{ translate('upload_logo') }}</label>
                                 </div>
@@ -233,7 +233,7 @@
                                     <input type="file" name="banner" id="banner-upload"
                                         class="custom-file-input overflow-hidden __p-2p image-preview-before-upload"
                                         data-preview="#viewerBanner"
-                                        accept=".jpg, .png, .jpeg, .gif, .bmp, .tif, .tiff|image/*">
+                                        accept=".jpg, .jpeg">
                                     <label class="custom-file-label"
                                         for="banner-upload">{{ translate('upload_Banner') }}</label>
                                 </div>

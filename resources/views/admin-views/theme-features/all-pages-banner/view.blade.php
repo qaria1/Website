@@ -54,7 +54,7 @@
                                         <div class="custom-file text-left">
                                             <input type="file" name="image" id="banner-image" data-preview="#banner-image-view"
                                                 class="custom-file-input image-preview-before-upload"
-                                                accept=".jpg, .png, .jpeg, .gif, .bmp, .tif, .tiff|image/*">
+                                                accept=".jpg, .jpeg">
                                             <label class="custom-file-label title-color" for="banner-image">
                                                 {{ translate('choose') }} {{ translate('file') }}
                                             </label>

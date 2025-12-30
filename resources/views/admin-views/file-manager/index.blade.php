@@ -108,7 +108,7 @@
                             <div class="form-group">
                                 <div class="custom-file">
                                     <input type="file" name="images[]" id="customFileUpload" class="custom-file-input"
-                                           accept=".jpg, .png, .jpeg, .gif, .bmp, .tif, .tiff|image/*" multiple>
+                                           accept=".jpg, .jpeg" multiple>
                                     <label class="custom-file-label text-capitalize"
                                            for="customFileUpload">{{translate('choose_images')}}</label>
                                 </div>

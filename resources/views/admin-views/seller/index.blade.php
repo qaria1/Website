@@ -69,6 +69,20 @@
                                 </select>
                             </div>
                         </div>
+                        <div class="col-sm-6 col-lg-4 col-xl-3">
+                            <div class="form-group">
+                                <label for="name" class="title-color">{{ translate('sort_by') }}</label>
+                                <select class="form-control" name="sort_by">
+                                     <option selected {{ request('sort_by') != null ? '' : 'disabled' }}>
+                                        {{ translate('sort_by') }}
+                                    </option>
+                                    <option value="top_seller" {{ !is_null($sort_by) && $sort_by == 'top_seller' ? 'selected' : '' }}>
+                                    {{ translate('top_seller') }}</option>
+                                     <option value="older" {{ !is_null($sort_by) && $sort_by == 'older' ? 'selected' : '' }}>
+                                    {{ translate('older') }}</option>
+                                </select>
+                            </div>
+                        </div>
                         <div class="col-12">
                             <div class="d-flex gap-3 justify-content-end">
                                 <a href="{{ route('admin.sellers.seller-list', ['type' => request('type')]) }}"
@@ -150,10 +164,10 @@
                                     <td>
                                         <div class="d-flex align-items-center gap-10 w-max-content">
                                             <img width="50"
-                                            class="avatar rounded-circle" src="{{ getValidImage(path: 'storage/app/public/shop/'.$seller->shop->image, type: 'backend-basic') }}"
+                                            class="avatar rounded-circle" src="{{ getValidImage(path: 'storage/shop/'.$seller->shop->image, type: 'backend-basic') }}"
                                                 alt="">
                                             <div>
-                                                <a class="title-color" href="{{ route('admin.sellers.view', ['id' => $seller->id]) }}">{{ Str::limit($seller?->shop?->name, 20)}}</a>
+                                                <a class="title-color" href="{{ route('admin.sellers.view', ['id' => $seller->id]) }}">{{ Str::limit($seller->shop->name, 20)}}</a>
                                                 <br>
                                                 <span class="text-danger">
                                                     @if($seller->shop->temporary_close)

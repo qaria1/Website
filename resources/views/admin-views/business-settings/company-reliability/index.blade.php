@@ -50,7 +50,7 @@
                                             placeholder="{{ translate('type_your_title_text') }}">
                                         </div>
                                         <div class="custom_upload_input">
-                                            <input type="file" name="image" class="custom-upload-input-file aspect-ratio-3-15 upload-color-image" data-imgpreview="pre_img_header_logo{{$key}}" accept=".jpg, .png, .jpeg, .gif, .bmp, .tif, .tiff|image/*">
+                                            <input type="file" name="image" class="custom-upload-input-file aspect-ratio-3-15 upload-color-image" data-imgpreview="pre_img_header_logo{{$key}}" accept=".jpg, .jpeg">
                                             <span class="delete_file_input btn btn-outline-danger btn-sm square-btn d-none">
                                                 <i class="tio-delete"></i>
                                             </span>

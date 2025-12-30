@@ -45,7 +45,7 @@
                                     <div class="custom-file text-left">
                                         <input type="file" name="image" id="custom-file-upload" class="custom-file-input image-input"
                                                data-image-id="viewer"
-                                            accept=".jpg, .png, .jpeg, .gif, .bmp, .tif, .tiff|image/*">
+                                            accept=".jpg, .jpeg">
                                         <label class="custom-file-label text-capitalize" for="custom-file-upload">{{translate('choose_file')}}</label>
                                     </div>
                                 </div>
@@ -65,7 +65,7 @@
                                     <div class="custom-file text-left">
                                         <input type="file" name="banner" id="banner-upload" class="custom-file-input image-input"
                                                data-image-id="viewer-banner"
-                                               accept=".jpg, .png, .jpeg, .gif, .bmp, .tif, .tiff|image/*">
+                                               accept=".jpg, .jpeg">
                                         <label class="custom-file-label text-capitalize" for="banner-upload">{{translate('choose_file')}}</label>
                                     </div>
                                 </div>
@@ -88,7 +88,7 @@
                                     <div class="custom-file text-left">
                                         <input type="file" name="bottom_banner" id="bottom-banner-upload" class="custom-file-input image-input"
                                                data-image-id="viewer-bottom-banner"
-                                               accept=".jpg, .png, .jpeg, .gif, .bmp, .tif, .tiff|image/*">
+                                               accept=".jpg, .jpeg">
                                         <label class="custom-file-label" for="bottom-banner-upload">{{translate('choose_file')}}</label>
                                     </div>
                                 </div>
@@ -111,7 +111,7 @@
                                         <div class="custom-file text-left">
                                             <input type="file" name="offer_banner" id="offer-banner-upload" class="custom-file-input image-input"
                                                 data-image-id="viewer-offer-banner"
-                                                accept=".jpg, .png, .jpeg, .gif, .bmp, .tif, .tiff|image/*">
+                                                accept=".jpg, .jpeg">
                                             <label class="custom-file-label text-capitalize" for="offer-banner-upload">{{translate('choose_file')}}</label>
                                         </div>
                                     </div>

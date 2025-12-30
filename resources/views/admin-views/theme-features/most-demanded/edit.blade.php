@@ -51,7 +51,7 @@
                                             <input type="file" name="image" id="banner-image"
                                                    class="custom-file-input image-preview-before-upload"
                                                    data-preview="#viewer"
-                                                   accept=".jpg, .png, .jpeg, .gif, .bmp, .tif, .tiff|image/*">
+                                                   accept=".jpg, .jpeg">
                                             <label class="custom-file-label text-capitalize" for="banner-image">
                                                 {{ translate('choose_File') }}
                                             </label>

@@ -211,7 +211,7 @@
                                                         fill="#1455AC"/>
                                                 </svg>
                                                 <input type="file" id="msgfilesValue" class="h-100 position-absolute w-100 " hidden multiple
-                                                       accept=".jpg, .png, .jpeg, .gif, .bmp, .tif, .tiff|image/*">
+                                                       accept=".jpg, .jpeg">
                                             </label>
                                         @endif
                                         <textarea class="form-control w-0 {{ theme_root_path() == "default" ? 'pl-8':'' }}" id="msgInputValue"

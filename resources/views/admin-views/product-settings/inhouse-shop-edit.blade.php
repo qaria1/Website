@@ -100,7 +100,7 @@
                                     <div class="custom-file">
                                         <input type="file" name="shop_banner" data-preview="#viewerBanner"
                                                class="custom-file-input image-preview-before-upload"
-                                               accept=".jpg, .png, .jpeg, .gif, .bmp, .tif, .tiff|image/*">
+                                               accept=".jpg, .jpeg">
                                         <label class="custom-file-label" for="customFileUploadShop">
                                             {{ translate('choose_File') }}
                                         </label>
@@ -123,7 +123,7 @@
                                         <div class="custom-file">
                                             <input type="file" name="bottom_banner" id="BottomBannerUpload"
                                                    class="custom-file-input image-preview-before-upload" data-preview="#viewerBottomBanner"
-                                                   accept=".jpg, .png, .jpeg, .gif, .bmp, .tif, .tiff|image/*">
+                                                   accept=".jpg, .jpeg">
                                             <label class="custom-file-label text-capitalize"
                                                    for="BottomBannerUpload">{{ translate('upload_secondary_Banner') }}</label>
                                         </div>
@@ -148,7 +148,7 @@
                                         <div class="custom-file">
                                             <input type="file" name="offer_banner" id="offer-banner"
                                                    class="custom-file-input image-preview-before-upload" data-preview="#viewerOfferBanner"
-                                                   accept=".jpg, .png, .jpeg, .gif, .bmp, .tif, .tiff|image/*">
+                                                   accept=".jpg, .jpeg">
                                             <label class="custom-file-label" for="offer-banner">
                                                 {{ translate('Upload_Offer_Banner') }}
                                             </label>

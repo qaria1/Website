@@ -178,7 +178,7 @@
                                             <div class="custom_upload_input">
                                                 <input type="file" name="features_section_bottom_icon[]" class="custom-upload-input-file aspect-ratio-3-15 upload-color-image"
                                                        data-imgpreview="pre_img_header_logo"
-                                                       accept=".jpg, .png, .jpeg, .gif, .bmp, .tif, .tiff|image/*">
+                                                       accept=".jpg, .jpeg">
                                                 <span class="delete-file-input btn btn-outline-danger btn-sm square-btn d-none">
                                                     <i class="tio-delete"></i>
                                                 </span>
