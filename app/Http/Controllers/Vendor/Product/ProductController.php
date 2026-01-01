@@ -37,6 +37,7 @@ use App\Contracts\Repositories\DealOfTheDayRepositoryInterface;
 use App\Contracts\Repositories\BusinessSettingRepositoryInterface;
 use App\Contracts\Repositories\FlashDealProductRepositoryInterface;
 use App\Models\DeliveryClass;
+use function App\Utils\getCommissionPercent;
 
 class ProductController extends BaseController
 {
@@ -218,6 +219,9 @@ class ProductController extends BaseController
         // 10% commission, product price will be displayed adding 105 of its price
         // $defaultCommission = getWebConfig(name: 'sales_commission');
         // $dataArray['unit_price'] = ($defaultCommission / 100) * $dataArray['unit_price'] + $dataArray['unit_price'];
+        $price = $dataArray['unit_price'];
+        $commissionPercent = getCommissionPercent($price, $seller);
+        $dataArray['unit_price'] = $price + ($commissionPercent / 100) * $price;
 
         $dataArray['lifetime_end_date'] = $lifetimeEndDate;
         $savedProduct = $this->productRepo->add(data: $dataArray);
@@ -261,8 +265,12 @@ class ProductController extends BaseController
         $dataArray = $service->getUpdateProductData(request: $request, product: $product, updateBy: 'seller');
 
         // 10% commission, product price will be displayed adding 105 of its price
-        $defaultCommission = getWebConfig(name: 'sales_commission');
-        $dataArray['unit_price'] = ($defaultCommission / 100) * $dataArray['unit_price'] + $dataArray['unit_price'];
+        // $defaultCommission = getWebConfig(name: 'sales_commission');
+        // $dataArray['unit_price'] = ($defaultCommission / 100) * $dataArray['unit_price'] + $dataArray['unit_price'];
+        $seller = Seller::findOrFail(auth('seller')->id());
+        $price = $dataArray['unit_price'];
+        $commissionPercent = getCommissionPercent($price, $seller);
+        $dataArray['unit_price'] = $price + ($commissionPercent / 100) * $price;
 
         $this->productRepo->update(id: $id, data: $dataArray);
         $this->productRepo->addRelatedTags(request: $request, product: $product);
