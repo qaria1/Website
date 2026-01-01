@@ -94,7 +94,7 @@ class HomeController extends Controller
         //end
 
         $latest_products = $this->product->with(['reviews'])->active()->orderBy('id', 'desc')->take(8)->get();
-        $categories = $this->category->with('childes.childes')->where(['position' => 0])->priority()->take(8)->get();
+        $categories = $this->category->with('childes.childes')->where(['position' => 0])->where('home_status', true)->priority()->take(8)->get();
         $brands = Brand::active()->where('id', '<>', DEFAULT_BRAND)->take(15)->get();
         //best sell product
         $bestSellProduct = $this->order_details->with('product.reviews')
