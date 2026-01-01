@@ -199,7 +199,7 @@ class Product extends Model
                 $query->where(['status' => 1]);
             });
         })->when(!$brandSetting, function ($query) {
-            $query->whereNull('brand_id');
+            // $query->whereNull('brand_id'); // real issue
         })
             ->where(['status' => 1])
             ->where(['request_status' => 1])
