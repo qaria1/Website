@@ -15,4 +15,5 @@
     <p>Regards,<br>{{ $vendor->name ?? $companyName }}</p>
 
 </body>
+
 </html>

@@ -338,69 +338,69 @@ if (!$is_published) {
         });
 
         //SENANG-PAY
-        Route::group(['prefix' => 'senang-pay', 'as' => 'senang-pay.'], function () {
-            Route::get('pay', [SenangPayController::class, 'index']);
-            Route::any('callback', [SenangPayController::class, 'return_senang_pay']);
-        });
+        // Route::group(['prefix' => 'senang-pay', 'as' => 'senang-pay.'], function () {
+        //     Route::get('pay', [SenangPayController::class, 'index']);
+        //     Route::any('callback', [SenangPayController::class, 'return_senang_pay']);
+        // });
 
         //PAYTM
-        Route::group(['prefix' => 'paytm', 'as' => 'paytm.'], function () {
-            Route::get('pay', [PaytmController::class, 'payment']);
-            Route::any('response', [PaytmController::class, 'callback'])->name('response')
-                ->withoutMiddleware([\App\Http\Middleware\VerifyCsrfToken::class]);
-        });
+        // Route::group(['prefix' => 'paytm', 'as' => 'paytm.'], function () {
+        //     Route::get('pay', [PaytmController::class, 'payment']);
+        //     Route::any('response', [PaytmController::class, 'callback'])->name('response')
+        //         ->withoutMiddleware([\App\Http\Middleware\VerifyCsrfToken::class]);
+        // });
 
         //FLUTTERWAVE
-        Route::group(['prefix' => 'flutterwave-v3', 'as' => 'flutterwave-v3.'], function () {
-            Route::get('pay', [FlutterwaveV3Controller::class, 'initialize'])->name('pay');
-            Route::get('callback', [FlutterwaveV3Controller::class, 'callback'])->name('callback');
-        });
+        // Route::group(['prefix' => 'flutterwave-v3', 'as' => 'flutterwave-v3.'], function () {
+        //     Route::get('pay', [FlutterwaveV3Controller::class, 'initialize'])->name('pay');
+        //     Route::get('callback', [FlutterwaveV3Controller::class, 'callback'])->name('callback');
+        // });
 
         //PAYSTACK
-        Route::group(['prefix' => 'paystack', 'as' => 'paystack.'], function () {
-            Route::get('pay', [PaystackController::class, 'index'])->name('pay');
-            Route::post('payment', [PaystackController::class, 'redirectToGateway'])->name('payment');
-            Route::get('callback', [PaystackController::class, 'handleGatewayCallback'])->name('callback');
-        });
+        // Route::group(['prefix' => 'paystack', 'as' => 'paystack.'], function () {
+        //     Route::get('pay', [PaystackController::class, 'index'])->name('pay');
+        //     Route::post('payment', [PaystackController::class, 'redirectToGateway'])->name('payment');
+        //     Route::get('callback', [PaystackController::class, 'handleGatewayCallback'])->name('callback');
+        // });
 
         //BKASH
 
-        Route::group(['prefix' => 'bkash', 'as' => 'bkash.'], function () {
-            // Payment Routes for bKash
-            Route::get('make-payment', [BkashPaymentController::class, 'make_tokenize_payment'])->name('make-payment');
-            Route::any('callback', [BkashPaymentController::class, 'callback'])->name('callback');
-        });
+        // Route::group(['prefix' => 'bkash', 'as' => 'bkash.'], function () {
+        //     // Payment Routes for bKash
+        //     Route::get('make-payment', [BkashPaymentController::class, 'make_tokenize_payment'])->name('make-payment');
+        //     Route::any('callback', [BkashPaymentController::class, 'callback'])->name('callback');
+        // });
 
         //Liqpay
-        Route::group(['prefix' => 'liqpay', 'as' => 'liqpay.'], function () {
-            Route::get('payment', [LiqPayController::class, 'payment'])->name('payment');
-            Route::any('callback', [LiqPayController::class, 'callback'])->name('callback');
-        });
+        // Route::group(['prefix' => 'liqpay', 'as' => 'liqpay.'], function () {
+        //     Route::get('payment', [LiqPayController::class, 'payment'])->name('payment');
+        //     Route::any('callback', [LiqPayController::class, 'callback'])->name('callback');
+        // });
 
         //MERCADOPAGO
-        Route::group(['prefix' => 'mercadopago', 'as' => 'mercadopago.'], function () {
-            Route::get('pay', [MercadoPagoController::class, 'index'])->name('index');
-            Route::post('make-payment', [MercadoPagoController::class, 'make_payment'])->name('make_payment');
-        });
+        // Route::group(['prefix' => 'mercadopago', 'as' => 'mercadopago.'], function () {
+        //     Route::get('pay', [MercadoPagoController::class, 'index'])->name('index');
+        //     Route::post('make-payment', [MercadoPagoController::class, 'make_payment'])->name('make_payment');
+        // });
 
         //PAYMOB
-        Route::group(['prefix' => 'paymob', 'as' => 'paymob.'], function () {
-            Route::any('pay', [PaymobController::class, 'credit'])->name('pay');
-            Route::any('callback', [PaymobController::class, 'callback'])->name('callback');
-        });
+        // Route::group(['prefix' => 'paymob', 'as' => 'paymob.'], function () {
+        //     Route::any('pay', [PaymobController::class, 'credit'])->name('pay');
+        //     Route::any('callback', [PaymobController::class, 'callback'])->name('callback');
+        // });
 
         //PAYTABS
-        Route::group(['prefix' => 'paytabs', 'as' => 'paytabs.'], function () {
-            Route::any('pay', [PaytabsController::class, 'payment'])->name('pay');
-            Route::any('callback', [PaytabsController::class, 'callback'])->name('callback');
-            Route::any('response', [PaytabsController::class, 'response'])->name('response');
-        });
+        // Route::group(['prefix' => 'paytabs', 'as' => 'paytabs.'], function () {
+        //     Route::any('pay', [PaytabsController::class, 'payment'])->name('pay');
+        //     Route::any('callback', [PaytabsController::class, 'callback'])->name('callback');
+        //     Route::any('response', [PaytabsController::class, 'response'])->name('response');
+        // });
 
         //Pay Fast
-        Route::group(['prefix' => 'payfast', 'as' => 'payfast.'], function () {
-            Route::get('pay', [PayFastController::class, 'payment'])->name('payment');
-            Route::any('callback', [PayFastController::class, 'callback'])->name('callback');
-        });
+        // Route::group(['prefix' => 'payfast', 'as' => 'payfast.'], function () {
+        //     Route::get('pay', [PayFastController::class, 'payment'])->name('payment');
+        //     Route::any('callback', [PayFastController::class, 'callback'])->name('callback');
+        // });
     });
 }
 
@@ -410,4 +410,10 @@ Route::get('payment-fail', 'Customer\PaymentController@fail')->name('payment-fai
 
 Route::get('/test', function (){
     return view('welcome');
+});
+Route::get('/fs-test', function () {
+    Storage::disk('public')->put('fs-test.txt', 'ok');
+    return Storage::disk('public')->exists('fs-test.txt')
+        ? 'SAVED'
+        : 'FAILED';
 });

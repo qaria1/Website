@@ -52,6 +52,9 @@ class WalletTransactionRepository implements WalletTransactionRepositoryInterfac
             ->when(!empty($filters['transaction_type']) && $filters['transaction_type'] != 'all', function($query)use($filters){
                 $query->where('transaction_type',$filters['transaction_type']);
             })
+              ->when(!empty($filters['sort_by']), function($query)use($filters){
+                $query->orderBy('balance','desc');
+            })
             ->when(!empty($filters['customer_id']) &&  $filters['customer_id'] != 'all', function($query)use($filters) {
                 $query->where('user_id', $filters['customer_id']);
             })->latest();

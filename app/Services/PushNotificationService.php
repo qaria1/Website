@@ -4,7 +4,7 @@ namespace App\Services;
 
 class PushNotificationService
 {
-    public function getMessageKeyData(string $userType):array
+    public function getMessageKeyData(string $userType): array
     {
         $customer = [
             'order_pending_message',
@@ -55,7 +55,7 @@ class PushNotificationService
             'delivery_man' => $delivery_man,
         };
     }
-    public function getAddData(string $userType, string $value):array
+    public function getAddData(string $userType, string $value): array
     {
         return [
             'user_type' => $userType,
@@ -64,15 +64,13 @@ class PushNotificationService
             'created_at' => now(),
             'updated_at' => now(),
         ];
-
     }
-    public function getUpdateData(object $request,string $message,string $status,string $lang):array
+    public function getUpdateData(object $request, string $message, string $status, string $lang): array
     {
         return [
-            'message'=>$request->$message[array_search('en', $request->$lang)],
-            'status'=>$request->$status ?? false,
-            'updated_at'=>now(),
+            'message' => $request->$message[array_search('en', $request->$lang)],
+            'status' => $request->$status ?? false,
+            'updated_at' => now(),
         ];
     }
-
 }

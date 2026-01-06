@@ -17,14 +17,14 @@
                         <form action="{{route('vendor.coupon.add')}}" method="post">
                             @csrf
                             <div class="row">
-                                <input type="hidden" name="coupon_type" value="free_delivery">
-                                <div class="col-md-6 col-lg-4 form-group d-none">
+                                <div class="col-md-6 col-lg-4 form-group">
                                     <label for="name"
                                            class="title-color font-weight-medium d-flex">{{translate('coupon_type')}}</label>
-                                    <select class="form-control" id="coupon_type" name="" required>
-                                        <option disabled>{{translate('select_coupon_type')}}</option>
-                                        <option value="discount_on_purchase">{{translate('discount_on_Purchase')}}</option>
-                                        <option selected value="free_delivery">{{translate('free_Delivery')}}</option>
+                                    <select class="form-control" id="coupon_type" name="coupon_type" required>
+                                        <option disabled selected>{{translate('select_coupon_type')}}</option>
+                                        <option
+                                            value="discount_on_purchase">{{translate('discount_on_Purchase')}}</option>
+                                        <option value="free_delivery">{{translate('free_Delivery')}}</option>
                                     </select>
                                 </div>
                                 <div class="col-md-6 col-lg-4 form-group">
@@ -91,6 +91,7 @@
                                            id="minimum purchase"
                                            placeholder="{{translate('ex')}}: 100">
                                 </div>
+                                
                                 <div class="col-md-6 col-lg-4 form-group free_delivery" id="max-discount">
                                     <label for="name"
                                            class="title-color font-weight-medium d-flex">{{translate('maximum_discount')}} ($)</label>

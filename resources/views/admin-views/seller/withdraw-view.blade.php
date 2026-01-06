@@ -56,20 +56,40 @@
                 </div>
             </div>
             @if($withdrawalMethod)
+            @php
+                if (is_string($withdrawalMethod)) {
+                    $withdrawalMethod = json_decode($withdrawalMethod, true);
+
+                    if (is_string($withdrawalMethod)) {
+                        $withdrawalMethod = json_decode($withdrawalMethod, true);
+                    }
+                }
+
+                if ($withdrawalMethod instanceof \stdClass) {
+                    $withdrawalMethod = (array) $withdrawalMethod;
+                }
+            @endphp
+
                 <div class="col-md-4 mb-3">
                     <div class="card h-100">
                         <div class="card-body">
                             <div class="text-capitalize d-flex align-items-center justify-content-between gap-2 border-bottom pb-3 mb-4">
-                                <h3 class="h3 mb-0">{{ $withdrawalMethod['method_name'].' '.' '.translate('info')}} </h3>
+                               <h3 class="h3 mb-0">
+                                    {{ $withdrawalMethod['method_name'] . ' ' . translate('info') }}
+                                </h3>
                                 <i class="tio tio-dollar-outlined"></i>
                             </div>
                             <div class="mt-2">
-                                @foreach($withdrawalMethod as $key => $method)
-                                    <div class="flex-start">
-                                        <div><h5>{{ ucwords(str_replace('_',' ',$key)).' '.':' }}</h5></div>
-                                        <div class="mx-1"><h5>{{ $method }}</h5></div>
+                               @foreach($withdrawalMethod as $key => $method)
+                                <div class="flex-start">
+                                    <div>
+                                        <h5>{{ ucwords(str_replace('_',' ',$key)) }}:</h5>
                                     </div>
-                                @endforeach
+                                    <div class="mx-1">
+                                        <h5>{{ $method }}</h5>
+                                    </div>
+                                </div>
+                            @endforeach
                             </div>
                         </div>
                     </div>

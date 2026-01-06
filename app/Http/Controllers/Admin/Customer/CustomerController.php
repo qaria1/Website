@@ -58,7 +58,20 @@ class CustomerController extends BaseController
             relations: ['orders'],
             dataLimit: getWebConfig(name: 'pagination_limit')
         );
+              $filters = [
+            'sort_by' => $request['sort_by'],
+            'withCount' => 'orders'
+        ];
+
+        if($request->has('sort_by')){
+            $customers = $this->customerRepo->getListWhere(
+            filters: $filters,
+            relations: ['orders'],
+            dataLimit: getWebConfig(name: 'pagination_limit')
+        );
+        }
         return view(Customer::LIST[VIEW], [
+            'sort_by' => $request['sort_by'],
             'customers' => $customers,
         ]);
     }

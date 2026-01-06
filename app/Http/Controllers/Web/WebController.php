@@ -707,9 +707,25 @@ class WebController extends Controller
         }
 
         CartManager::cart_clean();
+         try {
+                $order = $this->orderRepo->getFirstWhere(
+                    params: ['id' => $order_id],
+                    relations: ['seller', 'shipping', 'details']
+                );
+                
+                $vendor = $this->vendorRepo->getFirstWhere(
+                    params: ['id' => $order['details']->first()->seller_id]
+                );
+
+                InvoiceUtils::sendOrderInvoice($order, $vendor);
+
+                return view(VIEW_FILE_NAMES['order_complete'], compact('order_ids'));
+            } catch (\Exception $e) {
+                Log::error('Invoice sending failed: ' . $e->getMessage());
+                Toastr::error(translate('invoice_sending_failed'));
+            }
 
 
-        return view(VIEW_FILE_NAMES['order_complete'], compact('order_ids'));
     }
     public function checkout_complete_wallet(Request $request = null)
     {
@@ -756,7 +772,23 @@ class WebController extends Controller
         if (session()->has('payment_mode') && session('payment_mode') == 'app') {
             return redirect()->route('payment-success');
         }
-        return view(VIEW_FILE_NAMES['order_complete'], compact('order_ids'));
+         try {
+                $order = $this->orderRepo->getFirstWhere(
+                    params: ['id' => $order_id],
+                    relations: ['seller', 'shipping', 'details']
+                );
+                
+                $vendor = $this->vendorRepo->getFirstWhere(
+                    params: ['id' => $order['details']->first()->seller_id]
+                );
+
+                InvoiceUtils::sendOrderInvoice($order, $vendor);
+
+                return view(VIEW_FILE_NAMES['order_complete'], compact('order_ids'));
+            } catch (\Exception $e) {
+                Log::error('Invoice sending failed: ' . $e->getMessage());
+                Toastr::error(translate('invoice_sending_failed'));
+            }
     }
 
     public function order_placed(): View

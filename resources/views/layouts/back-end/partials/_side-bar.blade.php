@@ -943,7 +943,7 @@
                                         </a>
                                     </li>
 
-                                    {{-- <li
+                                     <li
                                         class="nav-item {{ Request::is('admin/sellers/' . Vendor::WITHDRAW_LIST[URI]) ? 'active' : '' }}">
                                         <a class="nav-link " href="{{ route('admin.sellers.withdraw_list') }}"
                                             title="{{ translate('withdraws') }}">
@@ -959,7 +959,7 @@
                                             <span class="tio-circle nav-indicator-icon"></span>
                                             <span class="text-truncate">{{ translate('withdrawal_Methods') }}</span>
                                         </a>
-                                    </li> --}}
+                                    </li>
                                 </ul>
                             </li>
 

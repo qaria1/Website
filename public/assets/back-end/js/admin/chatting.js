@@ -317,7 +317,7 @@ $('.get-ajax-message-view').on('click', function () {
     let userId = $(this).data('user-id');
     $('.notify-alert-' + userId).remove();
     let actionURL = $('#chatting-post-url').data('url') + userId;
-
+    $("#msgInputValue").val('');
     $.ajaxSetup({
         headers: {'X-XSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')}
     });

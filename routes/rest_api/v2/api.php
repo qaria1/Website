@@ -98,7 +98,7 @@ Route::group(['namespace' => 'RestAPI\v2', 'prefix' => 'v2', 'middleware' => ['a
             Route::post('/', 'RegisterController@store');
         });
     });
-    Route::post('ls-lib-update', 'LsLibController@lib_update');
+    // Route::post('ls-lib-update', 'LsLibController@lib_update');
 
     Route::group(['prefix' => 'delivery-man', 'namespace' => 'delivery_man'], function () {
 

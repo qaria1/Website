@@ -1214,7 +1214,7 @@
                             <div class="img-responsive center-block d-block mx-auto">
                                 <img src="{{ dynamicAsset('public/assets/back-end/svg/illustrations/sorry.svg') }}" alt="public">
                                 <h4>
-                                    {{ translate('No_subscription_plan_available') }}
+                                    {{ translate('No_subscfggggggggription_plan_available') }}
                                 </h4>
                             </div>
                         @endforelse

@@ -220,7 +220,7 @@
                                                   aria-label="Search"></textarea>
                                         <div class="d-flex align-items-center justify-content-center bg-F1F7FF radius-right-button">
                                             <button class="aSend bg-transparent outline-0 border-0 shadow-0" type="submit" id="msgSendBtn">
-                                                <img src="{{dynamicAsset(path: 'public/public/assets/back-end/img/send-icon.png')}}" alt="">
+                                                <img src="{{dynamicAsset(path: 'public/assets/back-end/img/send-icon.png')}}" alt="">
                                             </button>
                                         </div>
                                     </div>

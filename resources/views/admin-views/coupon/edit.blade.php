@@ -18,13 +18,12 @@
                     <form action="{{route('admin.coupon.update',[$coupon['id']])}}" method="post">
                         @csrf
                         <div class="row">
-                            <input type="hidden" name="coupon_type" value="free_delivery">
-                            <div class="col-md-6 col-lg-4 form-group d-none">
+                            <div class="col-md-6 col-lg-4 form-group">
                                 <label for="name" class="title-color text-capitalize">{{translate('coupon_type')}}</label>
                                 <select class="form-control" id="coupon_type" name="coupon_type" required>
-                                    <option disabled>{{translate('select_Coupon_Type')}}</option>
+                                    <option disabled selected>{{translate('select_Coupon_Type')}}</option>
                                     <option value="discount_on_purchase" {{$coupon['coupon_type']=='discount_on_purchase'?'selected':''}}>{{translate('discount_on_Purchase')}}</option>
-                                    <option selected value="free_delivery" {{$coupon['coupon_type']=='free_delivery'?'selected':''}}>{{translate('free_Delivery')}}</option>
+                                    <option value="free_delivery" {{$coupon['coupon_type']=='free_delivery'?'selected':''}}>{{translate('free_Delivery')}}</option>
                                     <option value="first_order" {{$coupon['coupon_type']=='first_order'?'selected':''}}>{{translate('first_Order')}}</option>
                                 </select>
                             </div>
@@ -57,7 +56,7 @@
                                     <option value="inhouse" {{is_null($coupon['seller_id'])?'selected':''}}>{{translate('inhouse')}}</option>
                                     @endif
                                     @foreach($sellers as $seller)
-                                        <option value="{{ $seller->id }}" {{$coupon['seller_id']==$seller->id?'selected':''}}>{{ $seller?->shop?->name }}</option>
+                                        <option value="{{ $seller->id }}" {{$coupon['seller_id']==$seller->id?'selected':''}}>{{ $seller->shop->name }}</option>
                                     @endforeach
                                 </select>
                             </div>

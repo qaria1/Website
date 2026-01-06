@@ -211,8 +211,21 @@
                             <i class="tio-clear __text-26px"></i>
                         </button>
                     </div>
-                    @php($categories=\App\Models\Category::with(['childes.childes'])->where('position', 0)->priority()->paginate(11))
-                    <ul class="navbar-nav mega-nav pr-lg-2 pl-lg-2 mr-2 d-none d-md-block __mega-nav">
+              @php(
+                        $categories = \App\Models\Category::with([
+                            'childes' => function ($q) {
+                                $q->where('home_status', true)
+                                ->with(['childes' => function ($q2) {
+                                    $q2->where('home_status', true);
+                                }]);
+                            }
+                        ])
+                        ->where('position', 0)
+                        ->where('home_status', true)
+                        ->priority()
+                        ->paginate(11)
+                        )
+                        <ul class="navbar-nav mega-nav pr-lg-2 pl-lg-2 mr-2 d-none d-md-block __mega-nav">
                         <li class="nav-item {{!request()->is('/')?'dropdown':''}}">
 
                             <a class="nav-link dropdown-toggle category-menu-toggle-btn ps-0"

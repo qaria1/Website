@@ -14,7 +14,8 @@ class NotificationService
             'title' => $request['title'],
             'description' => $request['description'],
             'image' => $image,
-            'notification_count' => 1
+            'notification_count' => 1,
+            'topic' => $request['notification_type']
         ];
     }
     public function getNotificationUpdateData(object $request,string|null $notificationImage):array

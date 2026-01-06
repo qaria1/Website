@@ -25,8 +25,8 @@
         </div>
         <div class="row">
             <div class="col-lg-3 col-md-4">
-                @foreach(\App\Utils\CategoryManager::parents() as $category)
-                    <div class="card-header mb-2 p-2 side-category-bar action-get-categories-function"
+                @foreach(\App\Utils\CategoryManager::parents()->where('home_status',true) as $category)   
+                        <div class="card-header mb-2 p-2 side-category-bar action-get-categories-function"
                          data-route="{{ route('category-ajax', [$category['id']]) }}">
                         <img alt="" class="__img-18 mr-1"
                              src="{{ getValidImage(path: 'storage/app/public/category/'.$category->icon, type: 'category') }}">

@@ -181,6 +181,6 @@ Route::group(['namespace' => 'RestAPI\v3\seller', 'prefix' => 'v3/seller', 'midd
     Route::group(['prefix' => 'products'], function () {
         Route::get('{seller_id}/all-products', 'ProductController@get_seller_all_products');
     });
-    Route::post('ls-lib-update', 'LsLibController@lib_update');
+    // Route::post('ls-lib-update', 'LsLibController@lib_update');
 });
 

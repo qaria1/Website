@@ -128,7 +128,6 @@ trait PushNotificationTrait
             }
         } catch (\Exception $exception) {
         }
-
     }
 
     protected function withdrawStatusUpdateNotification(string $key, string $type, string $lang, int $status, string $fcmToken): void
@@ -264,7 +263,6 @@ trait PushNotificationTrait
                 return false;
             }
         } catch (\Exception $exception) {
-
         }
     }
 

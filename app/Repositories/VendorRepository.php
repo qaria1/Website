@@ -13,9 +13,7 @@ class VendorRepository implements VendorRepositoryInterface
 {
     public function __construct(
         private readonly Seller $vendor,
-    )
-    {
-    }
+    ) {}
 
     public function getByStatusExcept(string $status, array $relations = [], int $paginateBy = DEFAULT_DATA_LIMIT): Collection|array|LengthAwarePaginator
     {
@@ -31,14 +29,14 @@ class VendorRepository implements VendorRepositoryInterface
     public function getFirstWhere(array $params, array $relations = []): ?Model
     {
         return $this->vendor->with($relations)
-            ->when(isset($params['identity']),function ($query) use ($params){
+            ->when(isset($params['identity']), function ($query) use ($params) {
                 return $query->where(['email' => $params['identity']])
                     ->orWhere(['phone' => $params['identity']]);
             })
-            ->when(isset($params['id']),function ($query) use ($params){
+            ->when(isset($params['id']), function ($query) use ($params) {
                 return $query->where(['id' => $params['id']]);
             })
-            ->when(isset($params['withCount']),function ($query)use($params){
+            ->when(isset($params['withCount']), function ($query) use ($params) {
                 return $query->withCount($params['withCount']);
             })
             ->first();
@@ -47,21 +45,21 @@ class VendorRepository implements VendorRepositoryInterface
     public function getList(array $orderBy = [], array $relations = [], int|string $dataLimit = DEFAULT_DATA_LIMIT, int $offset = null): Collection|LengthAwarePaginator
     {
         $query = $this->vendor->with($relations)->when(!empty($orderBy), function ($query) use ($orderBy) {
-            $query->orderBy(array_key_first($orderBy),array_values($orderBy)[0]);
+            $query->orderBy(array_key_first($orderBy), array_values($orderBy)[0]);
         });
 
         return $dataLimit == 'all' ? $query->get() : $query->paginate($dataLimit);
     }
 
-    public function getListWhere(array $orderBy=[], string $searchValue = null, array $filters = [], array $relations = [], int|string $dataLimit = DEFAULT_DATA_LIMIT, int $offset = null):  Collection|LengthAwarePaginator
+    public function getListWhere(array $orderBy = [], string $searchValue = null, array $filters = [], array $relations = [], int|string $dataLimit = DEFAULT_DATA_LIMIT, int $offset = null): Collection|LengthAwarePaginator
     {
         $query = $this->vendor->with($relations)
-            ->when($searchValue, function ($query) use($searchValue){
+            ->when($searchValue, function ($query) use ($searchValue) {
                 $query->orWhere('f_name', 'like', "%$searchValue%")
                     ->orWhere('l_name', 'like', "%$searchValue%")
                     ->orWhere('phone', 'like', "%$searchValue%")
                     ->orWhere('email', 'like', "%$searchValue%")
-                    ->orWhereHas('shop', function ($query) use($searchValue) {
+                    ->orWhereHas('shop', function ($query) use ($searchValue) {
                         $query->where('name', 'like', "%$searchValue%");
                     });
             })
@@ -71,11 +69,12 @@ class VendorRepository implements VendorRepositoryInterface
             ->when(!empty($relations) && in_array('orders', $relations), function ($query) {
                 $query->withCount('orders');
             })
-            ->when(!empty($orderBy), function ($query) use ($orderBy) {
-                $query->orderBy(array_key_first($orderBy),array_values($orderBy)[0]);
-            });
+            // ->when(!empty($orderBy), function ($query) use ($orderBy) {
+            //     $query->orderBy(array_key_first($orderBy), array_values($orderBy)[0]);
+            // })
+            ->withCount('orders');
 
-        if(isset($filters['subscription_plan_id'])){
+        if (isset($filters['subscription_plan_id'])) {
 
             // Additional filters for subscription plan, billing type, and status
             $query->when($filters['subscription_plan_id'], function ($query, $subscriptionPlanId) {
@@ -85,29 +84,42 @@ class VendorRepository implements VendorRepositoryInterface
             });
         }
 
-        if(isset($filters['billing_id'])){
+        if (isset($filters['billing_id'])) {
             $query->when($filters['billing_id'], function ($query, $billingId) {
                 $query->whereHas('subscriptions', function ($query) use ($billingId) {
                     $query->where('billing_type_id', $billingId);
                 });
             });
-
         }
 
-        if(isset($filters['status'])){
+        if (isset($filters['status'])) {
             $query->when($filters['status'], function ($query, $status) {
                 $status == 'approved' ? $query->where('status', $status) : $query->whereIn('status', $status);
             });
         }
+        if (isset($filters['sort_by'])) {
+            switch ($filters['sort_by']) {
+                case 'top_seller':
+                    $query->withCount('orders')->orderByDesc('orders_count');
+                    break;
+                case 'older':
+                    $query->orderBy('created_at', 'asc');
+                    break;
+            }
+        } elseif (!empty($orderBy)) {
+            $query->orderBy(array_key_first($orderBy), array_values($orderBy)[0]);
+        }
+
+
         // dd($filters);
 
-        $filters += ['searchValue' =>$searchValue];
+        $filters += ['searchValue' => $searchValue];
         return $dataLimit == 'all' ? $query->get() : $query->paginate($dataLimit)->appends($filters);
     }
 
     public function update(string $id, array $data): bool
     {
-        return $this->vendor->where(['id'=>$id])->update($data);
+        return $this->vendor->where(['id' => $id])->update($data);
     }
 
     public function delete(array $params): bool

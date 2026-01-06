@@ -54,6 +54,14 @@ class LoyaltyPointTransactionRepository implements LoyaltyPointTransactionReposi
             ->when(isset($filters['user_id']), function ($query) use ($filters) {
                 $query->where('user_id', $filters['user_id']);
             })
+             ->when(isset($filters['sort_by']), function ($query) use ($filters) {
+                match ($filters['sort_by']) {
+                    'loyalty_point_desc' => $query->orderBy('balance', 'DESC'),
+                    'loyalty_point_asc'  => $query->orderBy('balance', 'ASC'),
+                    default        => $query->latest(),
+                };
+                $query->orderBy('balance', 'DESC');
+            })
             ->when(!empty($orderBy), function ($query) use ($orderBy) {
                 $query->orderBy(array_key_first($orderBy), array_values($orderBy)[0]);
             });
@@ -63,7 +71,7 @@ class LoyaltyPointTransactionRepository implements LoyaltyPointTransactionReposi
 
     public function getListWhereSelect(array $orderBy = [], string $searchValue = null, array $filters = [], array $relations = [], int|string $dataLimit = DEFAULT_DATA_LIMIT, int $offset = null): Collection|LengthAwarePaginator
     {
-        $query = $this->loyaltyPointTransaction->selectRaw('sum(credit) as total_credit, sum(debit) as total_debit')
+        $query = $this->loyaltyPointTransaction->selectRaw('sum(credit) as total_credit, sum(debit) as total_debit, balance')
             ->when(($filters['from'] && $filters['to']), function ($query) use ($filters) {
                 $query->whereBetween('created_at', [$filters['from'] . ' 00:00:00', $filters['to'] . ' 23:59:59']);
             })
@@ -72,6 +80,9 @@ class LoyaltyPointTransactionRepository implements LoyaltyPointTransactionReposi
             })
             ->when($filters['customer_id'], function ($query) use ($filters) {
                 $query->where('user_id', $filters['customer_id']);
+            })
+            ->when($filters['sort_by'], function ($query) use ($filters) {
+                $query->orderBy('balance', 'DESC');
             })->latest();
 
         return $dataLimit == 'all' ? $query->get() : $query->paginate($dataLimit)->appends(['searchValue' => $searchValue]);

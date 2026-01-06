@@ -105,12 +105,12 @@
                                             href="{{ route('admin.business-settings.subscription.billing-type.index', [$plan->id]) }}">
                                             <i class="tio-folder-add"></i>
                                         </a>
-                                        {{-- <a title="{{ translate('delete') }}"
+                                         <a title="{{ translate('delete') }}"
                                             class="btn btn-outline-danger btn-sm delete-data-without-form"
                                             data-action="{{ route('admin.business-settings.shipping-method.delete') }}"
                                             data-id="{{ $plan->id }}">
                                             <i class="tio-delete"></i>
-                                        </a> --}}
+                                        </a>
                                     </div>
                                 </td>
                             </tr>
@@ -128,7 +128,7 @@
             @endif
         </div>
 
-        <div class="card mt-3">
+        <!-- <div class="card mt-3">
             <div class="border-bottom px-4 py-3">
                 <h5 class="mb-0 text-capitalize d-flex align-items-center gap-2 text-capitalize">
                     {{ translate('trial_subscription_setting') }}
@@ -177,7 +177,7 @@
                     </div>
                 </form>
             </div>
-        </div>
+        </div> -->
 
     </div>
 

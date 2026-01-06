@@ -27,6 +27,7 @@ class Notification extends Model
         'notification_count',
         'image',
         'status',
+        'topic'
     ];
     protected $casts = [
         'sent_by' => 'string',

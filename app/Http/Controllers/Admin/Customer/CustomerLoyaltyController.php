@@ -44,6 +44,7 @@ class CustomerLoyaltyController extends BaseController
             'from' => $request['from'],
             'transaction_type' => $request['transaction_type'],
             'customer_id' => $request['customer_id'],
+            'sort_by' => $request['sort_by'],
         ];
         $data = $this->loyaltyPointTransactionRepo->getListWhereSelect(filters:$filters, dataLimit:'all');
         $transactions = $this->loyaltyPointTransactionRepo->getListWhere(

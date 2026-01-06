@@ -7,12 +7,42 @@
     <div class="content container-fluid">
         <div class="mb-4">
             <h2 class="h1 mb-0 text-capitalize d-flex align-items-center gap-2">
-                <img width="20" src="{{asset('/public/assets/back-end/img/customer.png')}}" alt="">
-                {{translate('customer_list')}}
-                <span class="badge badge-soft-dark radius-50">{{count($customers)}}</span>
+                <img width="20" src="{{ asset('/public/assets/back-end/img/customer.png') }}" alt="">
+                {{ translate('customer_list') }}
+                <span class="badge badge-soft-dark radius-50">{{ count($customers) }}</span>
             </h2>
         </div>
-        <div class="card">
+        <div class="card card-body">
+            <form action="{{ url()->current() }}" method="GET">
+                <div class="row gy-3 align-items-end">
+                      <div class="col-md-4">
+                        <div>
+                            <label for="top-buyer" class="title-color d-flex">{{ translate('sort_by') }}</label>
+                            <select class="form-control" name="sort_by">
+                                <option value="" selected> {{ '---' . translate('select_cutomer_sorting_order') . '---' }} </option>
+                                <option value="top_buyer" {{ !is_null($sort_by) && $sort_by == 'top_buyer' ? 'selected' : '' }}>
+                                    {{ translate('top_buyer') }}</option>
+                                     <option value="top_buyer_by_volume" {{ !is_null($sort_by) && $sort_by == 'top_buyer_by_volume' ? 'selected' : '' }}>
+                                    {{ translate('top_buyer_by_volume') }}</option>
+                                     <option value="oldest" {{ !is_null($sort_by) && $sort_by == 'oldest' ? 'selected' : '' }}>
+                                    {{ translate('oldest') }}</option>
+                                     <option value="newest" {{ !is_null($sort_by) && $sort_by == 'newest' ? 'selected' : '' }}>
+                                    {{ translate('newest') }}</option>
+                            </select>
+                        </div>
+                    </div>
+                   <div class="col-md-2">
+                        <div>
+                            <button id="filter" type="submit" class="btn btn--primary btn-block filter">
+                                <i class="tio-filter-list nav-icon"></i>
+                                {{ translate('filter') }}
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+        <div class="card mt-20">
             <div class="px-3 py-4">
                 <div class="row gy-2 align-items-center">
                     <div class="col-sm-8 col-md-6 col-lg-4">
@@ -24,9 +54,9 @@
                                     </div>
                                 </div>
                                 <input id="datatableSearch_" type="search" name="searchValue" class="form-control"
-                                       placeholder="{{translate('search_by_Name_or_Email_or_Phone')}}"
-                                       aria-label="Search orders" value="{{ request('searchValue') }}">
-                                <button type="submit" class="btn btn--primary">{{translate('search')}}</button>
+                                    placeholder="{{ translate('search_by_Name_or_Email_or_Phone') }}"
+                                    aria-label="Search orders" value="{{ request('searchValue') }}">
+                                <button type="submit" class="btn btn--primary">{{ translate('search') }}</button>
                             </div>
                         </form>
                     </div>
@@ -34,15 +64,16 @@
                         <div class="d-flex justify-content-sm-end">
                             <button type="button" class="btn btn-outline--primary" data-toggle="dropdown">
                                 <i class="tio-download-to"></i>
-                                {{translate('export')}}
+                                {{ translate('export') }}
                                 <i class="tio-chevron-down"></i>
                             </button>
                             <ul class="dropdown-menu dropdown-menu-right">
                                 <li>
                                     <a class="dropdown-item"
-                                       href="{{route('admin.customer.export',['searchValue'=>request('searchValue')])}}">
-                                        <img width="14" src="{{asset('/public/assets/back-end/img/excel.png')}}" alt="">
-                                        {{translate('excel')}}
+                                        href="{{ route('admin.customer.export', ['searchValue' => request('searchValue')]) }}">
+                                        <img width="14" src="{{ asset('/public/assets/back-end/img/excel.png') }}"
+                                            alt="">
+                                        {{ translate('excel') }}
                                     </a>
                                 </li>
                             </ul>
@@ -51,97 +82,96 @@
                 </div>
             </div>
             <div class="table-responsive datatable-custom">
-                <table
-                    style="text-align: {{Session::get('direction') === "rtl" ? 'right' : 'left'}};"
+                <table style="text-align: {{ Session::get('direction') === 'rtl' ? 'right' : 'left' }};"
                     class="table table-hover table-borderless table-thead-bordered table-nowrap table-align-middle card-table w-100">
                     <thead class="thead-light thead-50 text-capitalize">
-                    <tr>
-                        <th>{{translate('SL')}}</th>
-                        <th>{{translate('customer_name')}}</th>
-                        <th>{{translate('contact_info')}}</th>
-                        <th>{{translate('total_Order')}} </th>
-                        <th class="text-center">{{translate('block')}} / {{translate('unblock')}}</th>
-                        <th class="text-center">{{translate('action')}}</th>
-                    </tr>
+                        <tr>
+                            <th>{{ translate('SL') }}</th>
+                            <th>{{ translate('customer_name') }}</th>
+                            <th>{{ translate('contact_info') }}</th>
+                            <th>{{ translate('total_Order') }} </th>
+                            <th class="text-center">{{ translate('block') }} / {{ translate('unblock') }}</th>
+                            <th class="text-center">{{ translate('action') }}</th>
+                        </tr>
                     </thead>
                     <tbody>
-                    @foreach($customers as $key=>$customer)
-                        <tr>
-                            <td>
-                                {{$customers->firstItem()+$key}}
-                            </td>
-                            <td>
-                                <a href="{{route('admin.customer.view',[$customer['id']])}}"
-                                   class="title-color hover-c1 d-flex align-items-center gap-10">
-                                    <img src="{{getValidImage(path: 'storage/app/public/profile/'.$customer->image,type:'backend-profile')}}"
-                                         class="avatar rounded-circle " alt="" width="40">
-                                    {{Str::limit($customer['f_name']." ".$customer['l_name'],20)}}
-                                </a>
-                            </td>
-                            <td>
-                                <div class="mb-1">
-                                    <strong><a class="title-color hover-c1"
-                                               href="mailto:{{$customer->email}}">{{$customer->email}}</a></strong>
-
-                                </div>
-                                <a class="title-color hover-c1" href="tel:{{$customer->phone}}">{{$customer->phone}}</a>
-
-                            </td>
-                            <td>
-                                <label class="btn text-info bg-soft-info font-weight-bold px-3 py-1 mb-0 fz-12">
-                                    {{$customer->orders_count}}
-                                </label>
-                            </td>
-                            <td>
-                                @if($customer['email'] == 'walking@customer.com')
-                                    <div class="text-center">
-                                        <div class="badge badge-soft-version">{{ translate('default') }}</div>
-                                    </div>
-                                @else
-                                    <form action="{{route('admin.customer.status-update')}}" method="post"
-                                          id="customer-status{{$customer['id']}}-form" class="customer-status-form">
-                                        @csrf
-                                        <input type="hidden" name="id" value="{{$customer['id']}}">
-                                        <label class="switcher mx-auto">
-                                            <input type="checkbox" class="switcher_input toggle-switch-message"
-                                                   id="customer-status{{$customer['id']}}" name="status" value="1"
-                                                   {{ $customer['is_active'] == 1 ? 'checked':'' }}
-                                                   data-modal-id = "toggle-status-modal"
-                                                   data-toggle-id = "customer-status{{$customer['id']}}"
-                                                   data-on-image = "customer-block-on.png"
-                                                   data-off-image = "customer-block-off.png"
-                                                   data-on-title = "{{translate('want_to_unblock').' '.$customer['f_name'].' '.$customer['l_name'].'?'}}"
-                                                   data-off-title = "{{translate('want_to_block').' '.$customer['f_name'].' '.$customer['l_name'].'?'}}"
-                                                   data-on-message = "<p>{{translate('if_enabled_this_customer_will_be_unblocked_and_can_log_in_to_this_system_again')}}</p>"
-                                                   data-off-message = "<p>{{translate('if_disabled_this_customer_will_be_blocked_and_cannot_log_in_to_this_system')}}</p>">
-                                            <span class="switcher_control"></span>
-                                        </label>
-                                    </form>
-                                @endif
-                            </td>
-
-                            <td>
-                                <div class="d-flex justify-content-center gap-2">
-                                    <a title="{{translate('view')}}"
-                                       class="btn btn-outline-info btn-sm square-btn"
-                                       href="{{route('admin.customer.view',[$customer['id']])}}">
-                                        <i class="tio-invisible"></i>
+                        @foreach ($customers as $key => $customer)
+                            <tr>
+                                <td>
+                                    {{ $customers->firstItem() + $key }}
+                                </td>
+                                <td>
+                                    <a href="{{ route('admin.customer.view', [$customer['id']]) }}"
+                                        class="title-color hover-c1 d-flex align-items-center gap-10">
+                                        <img src="{{ getValidImage(path: 'storage/profile/' . $customer->image, type: 'backend-profile') }}"
+                                            class="avatar rounded-circle " alt="" width="40">
+                                        {{ Str::limit($customer['f_name'] . ' ' . $customer['l_name'], 20) }}
                                     </a>
-                                    @if($customer['id'] != '0')
-                                        <a title="{{translate('delete')}}"
-                                           class="btn btn-outline-danger btn-sm delete square-btn delete-data" href="javascript:"
-                                           data-id="customer-{{$customer['id']}}">
-                                            <i class="tio-delete"></i>
-                                        </a>
+                                </td>
+                                <td>
+                                    <div class="mb-1">
+                                        <strong><a class="title-color hover-c1"
+                                                href="mailto:{{ $customer->email }}">{{ $customer->email }}</a></strong>
+
+                                    </div>
+                                    <a class="title-color hover-c1"
+                                        href="tel:{{ $customer->phone }}">{{ $customer->phone }}</a>
+
+                                </td>
+                                <td>
+                                    <label class="btn text-info bg-soft-info font-weight-bold px-3 py-1 mb-0 fz-12">
+                                        {{ $customer->orders_count }}
+                                    </label>
+                                </td>
+                                <td>
+                                    @if ($customer['email'] == 'walking@customer.com')
+                                        <div class="text-center">
+                                            <div class="badge badge-soft-version">{{ translate('default') }}</div>
+                                        </div>
+                                    @else
+                                        <form action="{{ route('admin.customer.status-update') }}" method="post"
+                                            id="customer-status{{ $customer['id'] }}-form" class="customer-status-form">
+                                            @csrf
+                                            <input type="hidden" name="id" value="{{ $customer['id'] }}">
+                                            <label class="switcher mx-auto">
+                                                <input type="checkbox" class="switcher_input toggle-switch-message"
+                                                    id="customer-status{{ $customer['id'] }}" name="status"
+                                                    value="1" {{ $customer['is_active'] == 1 ? 'checked' : '' }}
+                                                    data-modal-id = "toggle-status-modal"
+                                                    data-toggle-id = "customer-status{{ $customer['id'] }}"
+                                                    data-on-image = "customer-block-on.png"
+                                                    data-off-image = "customer-block-off.png"
+                                                    data-on-title = "{{ translate('want_to_unblock') . ' ' . $customer['f_name'] . ' ' . $customer['l_name'] . '?' }}"
+                                                    data-off-title = "{{ translate('want_to_block') . ' ' . $customer['f_name'] . ' ' . $customer['l_name'] . '?' }}"
+                                                    data-on-message = "<p>{{ translate('if_enabled_this_customer_will_be_unblocked_and_can_log_in_to_this_system_again') }}</p>"
+                                                    data-off-message = "<p>{{ translate('if_disabled_this_customer_will_be_blocked_and_cannot_log_in_to_this_system') }}</p>">
+                                                <span class="switcher_control"></span>
+                                            </label>
+                                        </form>
                                     @endif
-                                </div>
-                                <form action="{{route('admin.customer.delete',[$customer['id']])}}"
-                                      method="post" id="customer-{{$customer['id']}}">
-                                    @csrf @method('delete')
-                                </form>
-                            </td>
-                        </tr>
-                    @endforeach
+                                </td>
+
+                                <td>
+                                    <div class="d-flex justify-content-center gap-2">
+                                        <a title="{{ translate('view') }}" class="btn btn-outline-info btn-sm square-btn"
+                                            href="{{ route('admin.customer.view', [$customer['id']]) }}">
+                                            <i class="tio-invisible"></i>
+                                        </a>
+                                        @if ($customer['id'] != '0')
+                                            <a title="{{ translate('delete') }}"
+                                                class="btn btn-outline-danger btn-sm delete square-btn delete-data"
+                                                href="javascript:" data-id="customer-{{ $customer['id'] }}">
+                                                <i class="tio-delete"></i>
+                                            </a>
+                                        @endif
+                                    </div>
+                                    <form action="{{ route('admin.customer.delete', [$customer['id']]) }}" method="post"
+                                        id="customer-{{ $customer['id'] }}">
+                                        @csrf @method('delete')
+                                    </form>
+                                </td>
+                            </tr>
+                        @endforeach
                     </tbody>
                 </table>
             </div>
@@ -150,11 +180,11 @@
                     {!! $customers->links() !!}
                 </div>
             </div>
-            @if(count($customers)==0)
+            @if (count($customers) == 0)
                 <div class="text-center p-4">
-                    <img class="mb-3 w-160" src="{{asset('public/assets/back-end/svg/illustrations/sorry.svg')}}"
-                         alt="Image Description">
-                    <p class="mb-0">{{translate('no_data_to_show')}}</p>
+                    <img class="mb-3 w-160" src="{{ asset('public/assets/back-end/svg/illustrations/sorry.svg') }}"
+                        alt="Image Description">
+                    <p class="mb-0">{{ translate('no_data_to_show') }}</p>
                 </div>
             @endif
         </div>

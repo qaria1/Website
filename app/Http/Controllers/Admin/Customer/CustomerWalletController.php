@@ -79,6 +79,7 @@ class CustomerWalletController extends BaseController
             'to' => $request['to'],
             'from' => $request['from'],
             'transaction_type' => $request['transaction_type'] ?? 'all',
+            'sort_by' => $request['sort_by'],
             'customer_id' => $request['customer_id'],
         ];
 

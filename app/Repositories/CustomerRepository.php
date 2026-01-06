@@ -38,9 +38,14 @@ class CustomerRepository implements CustomerRepositoryInterface
 
     public function getListWhere(array $orderBy = [], string $searchValue = null, array $filters = [], array $relations = [], int|string $dataLimit = DEFAULT_DATA_LIMIT, int $offset = null): Collection|LengthAwarePaginator
     {
-        $query = $this->user->with($relations)
-            ->when(empty($filters['withCount']),function ($query)use($filters){
-                return $query->where($filters);
+         $query = $this->user->with($relations)
+            ->when(empty($filters['withCount']), function ($query) use ($filters) {
+                // Exclude keys that are not DB columns
+                $allowedFilters = collect($filters)->except(['sort_by', 'withCount', 'searchValue'])->toArray();
+
+                if (!empty($allowedFilters)) {
+                    $query->where($allowedFilters);
+                }
             })
             ->when($searchValue, function ($query) use ($searchValue) {
                 $query->orWhere('f_name', 'like', "%$searchValue%")
@@ -48,8 +53,28 @@ class CustomerRepository implements CustomerRepositoryInterface
                     ->orWhere('phone', 'like', "%$searchValue%")
                     ->orWhere('email', 'like', "%$searchValue%");
             })
-            ->when(isset($filters['withCount']),function ($query)use($filters){
+            ->when(isset($filters['withCount']), function ($query) use ($filters) {
                 return $query->withCount($filters['withCount']);
+            })
+            ->withSum('orders', 'order_amount')
+            ->when(isset($filters['sort_by']), function ($query) use ($filters) {
+                switch ($filters['sort_by']) {
+                    case 'top_buyer':
+                        $query->orderBy('orders_sum_order_amount', 'desc');
+                        break;
+
+                    case 'top_buyer_by_volume':
+                        $query->orderBy('orders_count', 'desc');
+                        break;
+
+                    case 'newest':
+                        $query->orderBy('created_at', 'desc');
+                        break;
+
+                    case 'oldest':
+                        $query->orderBy('created_at', 'asc');
+                        break;
+                }
             })
             ->when(!empty($orderBy), function ($query) use ($orderBy) {
                 $query->orderBy(array_key_first($orderBy), array_values($orderBy)[0]);

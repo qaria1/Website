@@ -334,7 +334,7 @@ Route::group(['prefix' => 'vendor', 'as' => 'vendor.'], function () {
                 Route::get('order-report-excel', 'order_report_export_excel')->name('order-report-excel');
             });
 
-            Route::any('set-date', 'App\Http\Controllers\Vendor\ReportController@set_date')->name('set-date');
+            // Route::any('set-date', 'App\Http\Controllers\Vendor\ReportController@set_date')->name('set-date');
         });
 
         Route::group(['prefix' => 'transaction', 'as' => 'transaction.'], function () {

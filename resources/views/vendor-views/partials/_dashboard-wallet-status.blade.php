@@ -7,11 +7,11 @@
                 <div class="font-weight-bold text-capitalize mb-30">
                     {{translate('total_revenue')}}
                 </div>
-                {{-- <a href="javascript:"
+                <a href="javascript:"
                     class="btn btn--primary px-4"
                     data-toggle="modal" data-target="#balance-modal">
                     {{translate('withdraw')}}
-                </a> --}}
+                </a>
             </div>
         </div>
     </div>
@@ -48,7 +48,7 @@
 
     <div class="col-lg-8">
         <div class="row g-2">
-            {{-- <div class="col-md-6">
+            <div class="col-md-6">
                 <div class="card card-body h-100 justify-content-center">
                     <div class="d-flex gap-2 justify-content-between align-items-center">
                         <div class="d-flex flex-column align-items-start">
@@ -60,8 +60,8 @@
                         </div>
                     </div>
                 </div>
-            </div> --}}
-            {{-- <div class="col-12">
+            </div>
+            <div class="col-12">
                 <div class="card card-body h-100 justify-content-center">
                     <div class="d-flex gap-2 justify-content-between align-items-center">
                         <div class="d-flex flex-column align-items-start">
@@ -73,8 +73,8 @@
                         </div>
                     </div>
                 </div>
-            </div> --}}
-            {{-- <div class="col-md-6">
+            </div>
+            <div class="col-md-6">
                 <div class="card card-body h-100 justify-content-center">
                     <div class="d-flex gap-2 justify-content-between align-items-center">
                         <div class="d-flex flex-column align-items-start">
@@ -86,8 +86,8 @@
                         </div>
                     </div>
                 </div>
-            </div> --}}
-            {{-- <div class="col-md-6">
+            </div>
+            <div class="col-md-6">
                 <div class="card card-body h-100 justify-content-center">
                     <div class="d-flex gap-2 justify-content-between align-items-center">
                         <div class="d-flex flex-column align-items-start">
@@ -99,8 +99,8 @@
                         </div>
                     </div>
                 </div>
-            </div> --}}
-            {{-- <div class="col-md-6">
+            </div>
+            <div class="col-md-6">
                 <div class="card card-body h-100 justify-content-center">
                     <div class="d-flex gap-2 justify-content-between align-items-center">
                         <div class="d-flex flex-column align-items-start">
@@ -112,8 +112,8 @@
                         </div>
                     </div>
                 </div>
-            </div> --}}
-            {{-- <div class="col-md-6">
+            </div>
+            <div class="col-md-6">
                 <div class="card card-body h-100 justify-content-center">
                     <div class="d-flex gap-2 justify-content-between align-items-center">
                         <div class="d-flex flex-column align-items-start">
@@ -125,7 +125,7 @@
                         </div>
                     </div>
                 </div>
-            </div> --}}
+            </div>
         </div>
     </div>
 
