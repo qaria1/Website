@@ -11,6 +11,8 @@ use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\DB;
 
+use function App\Utils\getCommissionPercent;
+
 //use Rennokki\QueryCache\Traits\QueryCacheable;
 
 
@@ -169,6 +171,7 @@ class Product extends Model
         'checked' => 'boolean',
 
     ];
+    protected $appends = ['price_without_commission'];
 
     public function subscription()
     {
@@ -360,5 +363,12 @@ class Product extends Model
     public function sellerSubscription()
     {
         return $this->belongsTo(SellerSubscription::class, 'seller_subscription_id');
+    }
+    public function getPriceWithoutCommissionAttribute()
+    {
+        $grossPrice = $this->unit_price;
+        $commissionPercent = getCommissionPercent($grossPrice, $this->seller_id);
+
+        return round($grossPrice / (1 + ($commissionPercent / 100)), 2);
     }
 }

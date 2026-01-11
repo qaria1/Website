@@ -23,6 +23,7 @@ use App\Models\FlashDealProduct;
 use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Validator;
+use function App\Utils\getCommissionPercent;
 
 class ProductController extends Controller
 {
@@ -322,8 +323,12 @@ class ProductController extends Controller
         }
 
         //combinations end
+        $unit_price = $request->unit_price;
+        $commissionPercent = getCommissionPercent($unit_price, $seller->id);
+        $unitPriceAfterCommission = $unit_price + (($commissionPercent / 100) * $unit_price);
+
         $product->variation = $request->product_type == 'physical' ? json_encode($variations) : json_encode([]);
-        $product->unit_price = Convert::usd($request->unit_price);
+        $product->unit_price = Convert::usd($unitPriceAfterCommission);
         $product->purchase_price = $request->purchase_price ? Convert::usd($request->purchase_price) : 0;
         $product->tax = $request->tax;
         $product->tax_type = $request->tax_type;
@@ -618,8 +623,13 @@ class ProductController extends Controller
         }
 
         //combinations end
+        $unit_price = $request->unit_price;
+        $commissionPercent = getCommissionPercent($unit_price, $seller->id);
+        $unitPriceAfterCommission = $unit_price + (($commissionPercent / 100) * $unit_price);
+
+
         $product->variation = $request->product_type == 'physical' ? json_encode($variations) : json_encode([]);
-        $product->unit_price = Convert::usd($request->unit_price);
+        $product->unit_price = Convert::usd($unitPriceAfterCommission);
         $product->purchase_price = $request->purchase_price ? Convert::usd($request->purchase_price) : 0;
         $product->tax = $request->tax;
         $product->tax_type = $request->tax_type;
