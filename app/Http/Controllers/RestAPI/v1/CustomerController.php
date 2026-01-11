@@ -403,7 +403,7 @@ class CustomerController extends Controller
 
         $user = Helpers::get_customer($request);
 
-        $details = OrderDetail::with('product', 'product.category', 'order.deliveryMan', 'verificationImages', 'seller.shop')
+        $details = OrderDetail::with('product', 'product.category.categoryRefundDate', 'order.deliveryMan', 'verificationImages', 'seller.shop')
             ->whereHas('order', function ($query) use ($request, $user) {
                 $query->where([
                     'customer_id' => $user == 'offline' ? $request->guest_id : $user->id,
