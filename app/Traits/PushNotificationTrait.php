@@ -8,6 +8,7 @@ use App\Models\ReferralCustomer;
 use App\Models\User;
 use Doctrine\DBAL\Exception\DatabaseDoesNotExist;
 use Illuminate\Support\Facades\Http;
+use App\Utils\Helpers;
 
 trait PushNotificationTrait
 {
@@ -424,5 +425,115 @@ trait PushNotificationTrait
             'assertion' => $jwt,
         ]);
         return $response->json('access_token') ?? null;
+    }
+    protected function sendOrderStatusChangeSMS($key, $type, $order)
+    {
+        try {
+
+            $curl = curl_init();
+
+            $lang = getDefaultLanguage();
+            /** for customer  */
+            if ($type == 'customer') {
+                $lang = $order->customer?->app_language ?? $lang;
+                $value = $this->pushNotificationMessage($key, 'customer', $lang);
+                $value = $this->textVariableDataFormat(value: $value, key: $key, userName: "{$order->customer?->f_name} {$order->customer?->l_name}", shopName: $order->seller?->shop?->name, deliveryManName: "{$order->deliveryMan?->f_name} {$order->deliveryMan?->l_name}", time: now()->diffForHumans(), orderId: $order->id);
+                if ($value) {
+                    $customerPhone = $order->customer_phone ? $order->customer_phone : $order->customer?->phone;
+                    $validatedPhone = Helpers::validate_phone($customerPhone);
+                    if ($validatedPhone) {
+                        $data = [
+                            'token' => env('GEEZ_SMS_KEY'),
+                            'phone' => $validatedPhone,
+                            'msg' => $value,
+                        ];
+
+                        curl_setopt_array($curl, [
+                            CURLOPT_URL => 'https://api.geezsms.com/api/v1/sms/send',
+                            CURLOPT_RETURNTRANSFER => true,
+                            CURLOPT_ENCODING => '',
+                            CURLOPT_MAXREDIRS => 10,
+                            CURLOPT_TIMEOUT => 0,
+                            CURLOPT_FOLLOWLOCATION => true,
+                            CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+                            CURLOPT_CUSTOMREQUEST => 'POST',
+                            CURLOPT_POSTFIELDS => $data,
+                        ]);
+
+                        $response = curl_exec($curl);
+                        curl_close($curl);
+                        $jsonResponse = json_decode($response, true);
+                        if ($response && !$jsonResponse['error']) {
+                            logger()->info("SMS SUCCESS CUSTOMER", [
+                                'state' => 'SUCCESS',
+                                'phone' => $validatedPhone ?? null,
+                                'order_id' => $order->id ?? null,
+                                'line' => __LINE__,
+                            ]);
+                        } else {
+                            logger()->warning("SMS FAILED CUSTOMER", [
+                                'state' => 'FAILED',
+                                'phone' => $validatedPhone ?? null,
+                                'response' => $response,
+                                'order_id' => $order->id ?? null,
+                                'line' => __LINE__,
+                            ]);
+                        }
+                    }
+                }
+            } else if ($type == 'seller') {
+                $lang = $order->seller?->app_language ?? $lang;
+                $value_seller = $this->pushNotificationMessage($key, 'seller', $lang);
+                $value_seller = $this->textVariableDataFormat(value: $value_seller, key: $key, userName: "{$order->customer?->f_name} {$order->customer?->l_name}", shopName: $order->seller?->shop?->name, deliveryManName: "{$order->deliveryMan?->f_name} {$order->deliveryMan?->l_name}", time: now()->diffForHumans(), orderId: $order->id);
+
+                $validatedPhone = Helpers::validate_phone($order->seller?->phone);
+                if ($validatedPhone) {
+
+                    $data = [
+                        'token' => env('GEEZ_SMS_KEY'),
+                        'phone' => $validatedPhone,
+                        'msg' => $value_seller,
+                    ];
+
+                    curl_setopt_array($curl, [
+                        CURLOPT_URL => 'https://api.geezsms.com/api/v1/sms/send',
+                        CURLOPT_RETURNTRANSFER => true,
+                        CURLOPT_ENCODING => '',
+                        CURLOPT_MAXREDIRS => 10,
+                        CURLOPT_TIMEOUT => 0,
+                        CURLOPT_FOLLOWLOCATION => true,
+                        CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+                        CURLOPT_CUSTOMREQUEST => 'POST',
+                        CURLOPT_POSTFIELDS => $data,
+                    ]);
+
+                    $response = curl_exec($curl);
+                    curl_close($curl);
+                    $jsonResponse = json_decode($response, true);
+                    if ($response && !$jsonResponse['error']) {
+                        logger()->info("SMS SUCCESS SELLER", [
+                            'state' => 'SUCCESS',
+                            'phone' => $validatedPhone ?? null,
+                            'order_id' => $order->id ?? null,
+                            'line' => __LINE__,
+                        ]);
+                    } else {
+                        logger()->warning("SMS FAILED SELLER", [
+                            'state' => 'FAILED',
+                            'phone' => $validatedPhone ?? null,
+                            'response' => $response,
+                            'order_id' => $order->id ?? null,
+                            'line' => __LINE__,
+                        ]);
+                    }
+                }
+            }
+        } catch (\Exception $e) {
+            logger()->error("Exception on SMS", [
+                'message' => $e->getMessage(),
+                'line' => $e->getLine(),
+                'file' => $e->getFile(),
+            ]);
+        }
     }
 }
