@@ -23,9 +23,8 @@ class CategoryController extends Controller
                 })->pluck('category_id');
         }
 
-        $categories = Category::
-        where('home_status', true)->
-        when($request->has('seller_id') && !empty($request->seller_id), function ($query) use ($categories_id) {
+        $categories = Category::where('home_status', true)
+        ->when($request->has('seller_id') && !empty($request->seller_id), function ($query) use ($categories_id) {
             $query->whereIn('id', $categories_id);
         })
         ->withCount(['product'=>function($query) use($request){
