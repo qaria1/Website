@@ -749,7 +749,7 @@ Route::group(['prefix' => 'admin', 'as' => 'admin.', 'middleware' => ['admin']],
                 Route::post(Pages::TERMS_CONDITION[URI], 'updateTermsCondition')->name('update-terms');
 
                 Route::get(Pages::PRIVACY_POLICY[URI], 'getPrivacyPolicyView')->name('privacy-policy');
-                Route::post(Pages::PRIVACY_POLICY[URI], 'updatePrivacyPolicy')->name('privacy-policy');
+                Route::post(Pages::PRIVACY_POLICY[URI], 'updatePrivacyPolicy')->name('privacy-policy-update');
 
                 Route::get(Pages::ABOUT_US[URI], 'getAboutUsView')->name('about-us');
                 Route::post(Pages::ABOUT_US[URI], 'updateAboutUs')->name('about-update');
