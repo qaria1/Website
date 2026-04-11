@@ -14,7 +14,7 @@
             <div class="col-md-12">
                 <div class="card">
                     <div class="card-body">
-                        <form action="{{route('admin.deal.update',[$deal['id']])}}" method="post"
+                        <form action="{{route('admin.deal.update-submit',[$deal['id']])}}" method="post"
                               class="text-start onsubmit-disable-action-button"
                               enctype="multipart/form-data">
                             @csrf

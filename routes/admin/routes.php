@@ -595,7 +595,7 @@ Route::group(['prefix' => 'admin', 'as' => 'admin.', 'middleware' => ['admin']],
             Route::get(FlashDeal::LIST [URI], 'index')->name('flash');
             Route::post(FlashDeal::LIST [URI], 'add');
             Route::get(FlashDeal::UPDATE[URI] . '/{id}', 'getUpdateView')->name('update');
-            Route::post(FlashDeal::UPDATE[URI] . '/{id}', 'update')->name('update');
+            Route::post(FlashDeal::UPDATE[URI] . '/{id}', 'update')->name('update-submit');
             Route::post(FlashDeal::STATUS[URI], 'updateStatus')->name('status-update');
             Route::post(FlashDeal::DELETE[URI], 'delete')->name('delete-product');
             Route::get(FlashDeal::ADD_PRODUCT[URI] . '/{deal_id}', 'getAddProductView')->name('add-product');

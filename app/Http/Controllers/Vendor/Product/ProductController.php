@@ -210,17 +210,21 @@ class ProductController extends BaseController
 
         $seller = Seller::findOrFail(auth('seller')->id());
         $activePlanRecord = $seller?->getActivePlanForSeller($seller);
+        if (!$activePlanRecord) {
+            Toastr::error(translate('Please activate a subscription plan first.'));
+            return redirect()->route('vendor.products.add');
+        }
 
-        $dataArray['seller_subscription_id'] = $activePlanRecord?->id;
+        $dataArray['seller_subscription_id'] = $activePlanRecord->id;
 
-        $maxProductLifeTime = $activePlanRecord?->max_product_lifecycle;
+        $maxProductLifeTime = $activePlanRecord->max_product_lifecycle;
         $lifetimeEndDate = isset($maxProductLifeTime) ? \Carbon\Carbon::now()->addDays((int)$maxProductLifeTime) : NULL;
 
         // 10% commission, product price will be displayed adding 105 of its price
         // $defaultCommission = getWebConfig(name: 'sales_commission');
         // $dataArray['unit_price'] = ($defaultCommission / 100) * $dataArray['unit_price'] + $dataArray['unit_price'];
         $price = $dataArray['unit_price'];
-        $commissionPercent = getCommissionPercent($price, $seller);
+        $commissionPercent = getCommissionPercent($price, $seller->id);
         $dataArray['unit_price'] = $price + ($commissionPercent / 100) * $price;
 
         $dataArray['lifetime_end_date'] = $lifetimeEndDate;
@@ -269,7 +273,7 @@ class ProductController extends BaseController
         // $dataArray['unit_price'] = ($defaultCommission / 100) * $dataArray['unit_price'] + $dataArray['unit_price'];
         $seller = Seller::findOrFail(auth('seller')->id());
         $price = $dataArray['unit_price'];
-        $commissionPercent = getCommissionPercent($price, $seller);
+        $commissionPercent = getCommissionPercent($price, $seller->id);
         $dataArray['unit_price'] = $price + ($commissionPercent / 100) * $price;
 
         $this->productRepo->update(id: $id, data: $dataArray);
