@@ -347,7 +347,8 @@ elementCustomUploadInputFileByID.on('change', function () {
     }
 })
 
-$('.product-add-requirements-check').on('click', function () {
+$('.product-add-requirements-check').on('click', function (event) {
+    event.preventDefault();
     getProductAddRequirementsCheck()
 })
 

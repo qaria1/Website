@@ -781,7 +781,7 @@
 
                     <div class="row justify-content-end gap-3 mt-3 mx-1">
                         <button type="reset" class="btn btn-secondary px-5">{{ translate('reset') }}</button>
-                        <button type="submit"
+                        <button type="button"
                             class="btn btn--primary px-5 product-add-requirements-check">{{ translate('submit') }}</button>
                     </div>
                 </form>
