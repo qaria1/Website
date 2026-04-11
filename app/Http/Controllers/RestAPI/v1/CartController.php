@@ -20,7 +20,7 @@ class CartController extends Controller
     public function cart(Request $request)
     {
         $user = Helpers::get_customer($request);
-        $cart_query = Cart::with('product:id,name,slug,current_stock,minimum_order_qty,variation');
+        $cart_query = Cart::with('product:id,name,slug,current_stock,minimum_order_qty,variation,unit_price');
         if($user == 'offline'){
             $cart = $cart_query->where(['customer_id' => $request->guest_id, 'is_guest'=>1])->get();
         }else{

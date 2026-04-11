@@ -474,7 +474,7 @@ Route::group(['prefix' => 'admin', 'as' => 'admin.', 'middleware' => ['admin']],
         Route::controller(EmployeeController::class)->group(function () {
             Route::get(Employee::LIST [URI], 'index')->name('list');
             Route::get(Employee::ADD[URI], 'getAddView')->name('add-new');
-            Route::post(Employee::ADD[URI], 'add')->name('add-new');
+            Route::post(Employee::ADD[URI], 'add')->name('add-new-post');
             Route::get(Employee::EXPORT[URI], 'exportList')->name('export');
             Route::get(Employee::VIEW[URI] . '/{id}', 'getView')->name('view');
             Route::get(Employee::UPDATE[URI] . '/{id}', 'getUpdateView')->name('update');
@@ -804,7 +804,7 @@ Route::group(['prefix' => 'admin', 'as' => 'admin.', 'middleware' => ['admin']],
         Route::group(['prefix' => 'language', 'as' => 'language.', 'middleware' => ['module:system_settings']], function () {
             Route::controller(LanguageController::class)->group(function () {
                 Route::get(Language::LIST [URI], 'index')->name('index');
-                Route::post(Language::ADD[URI], 'add')->name('add-new');
+                Route::post(Language::ADD[URI], 'add')->name('add-new-post');
                 Route::post(Language::STATUS[URI], 'updateStatus')->name('update-status');
                 Route::get(Language::DEFAULT_STATUS[URI], 'updateDefaultStatus')->name('update-default-status');
                 Route::post(Language::UPDATE[URI], 'update')->name('update');
@@ -1066,7 +1066,7 @@ Route::group(['prefix' => 'admin', 'as' => 'admin.', 'middleware' => ['admin']],
     Route::group(['prefix' => 'helpTopic', 'as' => 'helpTopic.', 'middleware' => ['module:system_settings']], function () {
         Route::controller(HelpTopicController::class)->group(function () {
             Route::get(HelpTopic::LIST [URI], 'index')->name('list');
-            Route::post(HelpTopic::ADD[URI], 'add')->name('add-new');
+            Route::post(HelpTopic::ADD[URI], 'add')->name('add-new-post');
             Route::get(HelpTopic::STATUS[URI] . '/{id}', 'updateStatus')->name('status');
             Route::get(HelpTopic::UPDATE[URI] . '/{id}', 'getUpdateResponse')->name('update');
             Route::post(HelpTopic::UPDATE[URI] . '/{id}', 'update');

@@ -278,7 +278,7 @@ class WebController extends Controller
             - Result order based on exclusive brand first then plan hierarchy from higher to lower
         */
         $key = explode(' ', $request['name']);
-        $product_ids = Product::select('products.id')
+            $product_ids = Product::select('products.id,unit_price,seller_id')
             ->join('sellers', 'products.user_id', '=', 'sellers.id')
             ->join('seller_subscriptions', 'sellers.id', '=', 'seller_subscriptions.seller_id')
             ->join('subscription_plans', 'seller_subscriptions.plan_id', '=', 'subscription_plans.id')

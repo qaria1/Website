@@ -241,7 +241,7 @@ class ProductManager
     {
         $user = Helpers::get_customer($request);
         $product = Product::find($product_id);
-        $products = Product::active()->with(['rating', 'flashDealProducts.flashDeal', 'tags','seller.shop'])
+        $products = Product::active()->with(['rating', 'flashDealProducts.flashDeal', 'tags', 'seller.shop'])
             ->withCount(['wishList' => function ($query) use ($user) {
                 $query->where('customer_id', $user != 'offline' ? $user->id : '0');
             }])
@@ -328,8 +328,7 @@ class ProductManager
     {
         $key = [base64_decode($name)];
 
-        $product = Product::select('name')
-            ->active()
+        $product = Product::select('id', 'name', 'unit_price', 'seller_id')->active()
             ->with(['rating', 'tags'])->where(function ($q) use ($key) {
                 foreach ($key as $value) {
                     $q->orWhere('name', 'like', "%{$value}%")
@@ -561,13 +560,13 @@ class ProductManager
                 $query->whereIn('brand_id', json_decode($request->brand_ids));
             })
             ->when($request->has('category') && $categories, function ($query) use ($categories) {
-                $query->where(function($query) use($categories){
+                $query->where(function ($query) use ($categories) {
                     return $query->whereIn('category_id', $categories)
                         ->orWhereIn('sub_category_id', $categories)
                         ->orWhereIn('sub_sub_category_id', $categories);
                 });
             })
-            ->when($request->has('product_id'), function ($query) use($request){
+            ->when($request->has('product_id'), function ($query) use ($request) {
                 return $query->whereNotIn('id', [$request['product_id']]);
             })
             ->orderBy('id', 'desc')
@@ -699,7 +698,6 @@ class ProductManager
                 $delivery_cost = $CategoryShippingCost ?
                     ($CategoryShippingCost->multiply_qty != 0 ? ($CategoryShippingCost->cost * $quantity) : $CategoryShippingCost->cost)
                     : 0;
-
             } elseif ($shipping_type->shipping_type == "product_wise") {
                 $delivery_cost = $product->multiply_qty != 0 ? ($product->shipping_cost * $quantity) : $product->shipping_cost;
             } elseif ($shipping_type->shipping_type == 'order_wise') {
@@ -756,7 +754,7 @@ class ProductManager
 
         foreach ($colors_collection as $color_json) {
             $color_array = json_decode($color_json, true);
-            if($color_array){
+            if ($color_array) {
                 $colors_merge = array_merge($colors_merge, $color_array);
             }
         }

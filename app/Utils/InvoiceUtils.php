@@ -7,6 +7,7 @@ use Mpdf\Mpdf;
 use Illuminate\Support\Str;
 use App\Mail\OrderInvoiceMail;
 use App\Enums\ViewPaths\Admin\Order;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\View;
 use Illuminate\Support\Facades\View as PdfView;
@@ -44,8 +45,14 @@ class InvoiceUtils
         $mpdf->Output($tempPath, \Mpdf\Output\Destination::FILE);
         // --- Queue email with attachment ---
         // --- Send email to customer ---
-        if (!empty($order->shipping_address_data->email)) {
-            Mail::to($order->shipping_address_data->email)->queue(
+        $shippingEmail = $order->shipping_address_data->email ?? null;
+        $customerEmail = $order->customer['email'] ?? null;
+        $email = $customerEmail ?: $shippingEmail;
+        Log::info('Sending order invoice email', [
+            'email'    => $email,
+        ]);
+        if (!empty($email)) {
+            Mail::to($email)->queue(
                 new OrderInvoiceMail($order, $vendor, $tempPath)
             );
         }

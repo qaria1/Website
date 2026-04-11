@@ -10,6 +10,7 @@ use App\Models\OfflinePaymentMethod;
 use App\Models\Order;
 use App\Models\OrderDetail;
 use App\Models\RefundRequest;
+use App\Models\Seller;
 use App\Models\Setting;
 use App\Models\ShippingAddress;
 use App\Traits\CommonTrait;
@@ -20,6 +21,7 @@ use App\Utils\Convert;
 use App\Utils\CustomerManager;
 use App\Utils\Helpers;
 use App\Utils\ImageManager;
+use App\Utils\InvoiceUtils;
 use App\Utils\OrderManager;
 use App\Utils\SMS_module;
 use Carbon\Carbon;
@@ -132,6 +134,8 @@ class OrderController extends Controller
             $order->billing_address_data = ($request['billing_address_id'] != null) ?  ShippingAddress::find($request['billing_address_id']) : $order['billing_address_data'];
             $order->order_note = ($request['order_note'] != null) ? $request['order_note'] : $order['order_note'];
             $order->save();
+            $vendor = Seller::where('id', $order->seller_id)->first();
+            InvoiceUtils::sendOrderInvoice($order, $vendor);            
 
             array_push($order_ids, $order_id);
         }
@@ -225,6 +229,8 @@ class OrderController extends Controller
             $order->billing_address_data = ($request['billing_address_id'] != null) ?  ShippingAddress::find($request['billing_address_id']) : $order['billing_address_data'];
             $order->order_note = ($request['order_note'] != null) ? $request['order_note'] : $order['order_note'];
             $order->save();
+            $vendor = Seller::where('id', $order->seller_id)->first();
+            InvoiceUtils::sendOrderInvoice($order, $vendor);  
 
             array_push($order_ids, $order_id);
         }
@@ -304,6 +310,8 @@ class OrderController extends Controller
                 $order->billing_address_data = ($request['billing_address_id'] != null) ?  ShippingAddress::find($request['billing_address_id']) : $order['billing_address_data'];
                 $order->order_note = ($request['order_note'] != null) ? $request['order_note'] : $order['order_note'];
                 $order->save();
+                $vendor = Seller::where('id', $order->seller_id)->first();
+                InvoiceUtils::sendOrderInvoice($order, $vendor);  
 
                 array_push($order_ids, $order_id);
             }
