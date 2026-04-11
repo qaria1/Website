@@ -37,6 +37,7 @@ use App\Contracts\Repositories\DealOfTheDayRepositoryInterface;
 use App\Contracts\Repositories\BusinessSettingRepositoryInterface;
 use App\Contracts\Repositories\FlashDealProductRepositoryInterface;
 use App\Models\DeliveryClass;
+use Illuminate\Support\Facades\Log;
 use function App\Utils\getCommissionPercent;
 
 class ProductController extends BaseController
@@ -155,85 +156,81 @@ class ProductController extends BaseController
 
     public function add(ProductAddRequest $request, ProductService $service): JsonResponse|RedirectResponse
     {
-        // dd($request->all());
-        if ($request->ajax()) {
-            return response()->json([], 200);
+        try {
+            if ($request->ajax()) {
+                return response()->json([], 200);
+            }
+
+            $sellerId = auth('seller')->id();
+            $latestSubscriptionPlanName = $this->getSellersLatestSubscriptionPlans($sellerId);
+
+            $dataArray = $service->getAddProductData(request: $request, addedBy: 'seller');
+
+            $categoryCode = intval($dataArray['category_id']);
+            $subCategoryCode = !empty($dataArray['sub_category_id']) ? intval($dataArray['sub_category_id']) : null;
+
+            $categoryCode = (Category::find($categoryCode))?->category_code;
+            $subCategoryCode = !empty($dataArray['sub_category_id']) ? Category::find($subCategoryCode)?->category_code : '';
+            $deliveryClassCode =
+            !empty($dataArray['sub_category_id']) ?
+            Category::where('id', intval($dataArray['sub_category_id']))->first()?->deliveryClass?->code :
+            Category::where('id', intval($dataArray['category_id']))->first()?->deliveryClass?->code;
+
+            $lastProductSubCode = ProductModel::where('product_sub_code', 'like', $latestSubscriptionPlanName . $categoryCode . $subCategoryCode . $deliveryClassCode . '%')
+                ->orderBy('product_sub_code', 'desc')
+                ->value('product_sub_code');
+
+            if ($lastProductSubCode) {
+                $lastProductSubCodeNumber = (int) substr($lastProductSubCode, -7);
+                $newProductSubCodeNumber = $lastProductSubCodeNumber + 1;
+            } else {
+                $newProductSubCodeNumber = 1;
+            }
+
+            $newProductSubCodeNumberPadded = str_pad($newProductSubCodeNumber, 7, '0', STR_PAD_LEFT);
+            $productSubCode = $latestSubscriptionPlanName . $categoryCode . $subCategoryCode . $deliveryClassCode . $newProductSubCodeNumberPadded;
+            $dataArray['product_sub_code'] = $productSubCode;
+
+            $seller = Seller::findOrFail(auth('seller')->id());
+            $activePlanRecord = $seller?->getActivePlanForSeller($seller);
+            if (!$activePlanRecord) {
+                Toastr::error(translate('Please activate a subscription plan first.'));
+                return redirect()->route('vendor.products.add');
+            }
+
+            $dataArray['seller_subscription_id'] = $activePlanRecord->id;
+
+            $maxProductLifeTime = $activePlanRecord->max_product_lifecycle;
+            $lifetimeEndDate = isset($maxProductLifeTime) ? \Carbon\Carbon::now()->addDays((int)$maxProductLifeTime) : NULL;
+
+            $price = $dataArray['unit_price'];
+            $commissionPercent = getCommissionPercent($price, $seller->id);
+            $dataArray['unit_price'] = $price + ($commissionPercent / 100) * $price;
+
+            $dataArray['lifetime_end_date'] = $lifetimeEndDate;
+            $savedProduct = $this->productRepo->add(data: $dataArray);
+            $this->productRepo->addRelatedTags(request: $request, product: $savedProduct);
+            $this->translationRepo->add(request: $request, model: 'App\Models\Product', id: $savedProduct->id);
+
+            Toastr::success(translate('product_added_successfully'));
+            return redirect()->route('vendor.products.list', ['type' => 'all']);
+        } catch (\Throwable $exception) {
+            Log::error('Vendor product add failed', [
+                'seller_id' => auth('seller')->id(),
+                'category_id' => $request->input('category_id'),
+                'sub_category_id' => $request->input('sub_category_id'),
+                'brand_id' => $request->input('brand_id'),
+                'code' => $request->input('code'),
+                'product_type' => $request->input('product_type'),
+                'message' => $exception->getMessage(),
+                'file' => $exception->getFile(),
+                'line' => $exception->getLine(),
+                'trace' => $exception->getTraceAsString(),
+            ]);
+
+            Toastr::error(translate('Product add failed. Please try again.'));
+            return redirect()->route('vendor.products.add')->withInput();
         }
-
-        $sellerId = auth('seller')->id();
-        $latestSubscriptionPlanName = $this->getSellersLatestSubscriptionPlans($sellerId);
-        // dd($latestSubscriptionPlanName);
-
-        $dataArray = $service->getAddProductData(request: $request, addedBy: 'seller');
-
-        // $categoryCode = $dataArray['category_id'];
-        $categoryCode = intval($dataArray['category_id']);
-        $subCategoryCode = !empty($dataArray['sub_category_id']) ? intval($dataArray['sub_category_id']) : null;
-        // dd($categoryCode);
-
-
-        $categoryCode = (Category::find($categoryCode))?->category_code;
-
-        /*
-
-            Note:
-            - handle when a subcategory is not selected as it it not required, only category is required.
-            - The product code will have a different structure when a subcategory is not present.
-
-        */
-        $subCategoryCode = !empty($dataArray['sub_category_id']) ? Category::find($subCategoryCode)?->category_code : '';
-        $deliveryClassCode =
-        !empty($dataArray['sub_category_id']) ?
-        Category::where('id', intval($dataArray['sub_category_id']))->first()?->deliveryClass?->code :
-        Category::where('id', intval($dataArray['category_id']))->first()?->deliveryClass?->code;
-
-
-        // Get the last product_sub_code with the given category and subcategory codes
-        $lastProductSubCode = ProductModel::where('product_sub_code', 'like', $latestSubscriptionPlanName . $categoryCode . $subCategoryCode . $deliveryClassCode . '%')
-            ->orderBy('product_sub_code', 'desc')
-            ->value('product_sub_code');
-
-        // If no previous product_sub_code exists, start with 1, otherwise increment the last value
-        if ($lastProductSubCode) {
-            $lastProductSubCodeNumber = (int) substr($lastProductSubCode, -7);
-            $newProductSubCodeNumber = $lastProductSubCodeNumber + 1;
-        } else {
-            $newProductSubCodeNumber = 1;
-        }
-
-        $newProductSubCodeNumberPadded = str_pad($newProductSubCodeNumber, 7, '0', STR_PAD_LEFT);
-
-        // Construct the new product_sub_code
-        $productSubCode = $latestSubscriptionPlanName . $categoryCode . $subCategoryCode . $deliveryClassCode . $newProductSubCodeNumberPadded;
-        $dataArray['product_sub_code'] = $productSubCode;
-        // dd($productSubCode);
-
-        $seller = Seller::findOrFail(auth('seller')->id());
-        $activePlanRecord = $seller?->getActivePlanForSeller($seller);
-        if (!$activePlanRecord) {
-            Toastr::error(translate('Please activate a subscription plan first.'));
-            return redirect()->route('vendor.products.add');
-        }
-
-        $dataArray['seller_subscription_id'] = $activePlanRecord->id;
-
-        $maxProductLifeTime = $activePlanRecord->max_product_lifecycle;
-        $lifetimeEndDate = isset($maxProductLifeTime) ? \Carbon\Carbon::now()->addDays((int)$maxProductLifeTime) : NULL;
-
-        // 10% commission, product price will be displayed adding 105 of its price
-        // $defaultCommission = getWebConfig(name: 'sales_commission');
-        // $dataArray['unit_price'] = ($defaultCommission / 100) * $dataArray['unit_price'] + $dataArray['unit_price'];
-        $price = $dataArray['unit_price'];
-        $commissionPercent = getCommissionPercent($price, $seller->id);
-        $dataArray['unit_price'] = $price + ($commissionPercent / 100) * $price;
-
-        $dataArray['lifetime_end_date'] = $lifetimeEndDate;
-        $savedProduct = $this->productRepo->add(data: $dataArray);
-        $this->productRepo->addRelatedTags(request: $request, product: $savedProduct);
-        $this->translationRepo->add(request: $request, model: 'App\Models\Product', id: $savedProduct->id);
-
-        Toastr::success(translate('product_added_successfully'));
-        return redirect()->route('vendor.products.list', ['type' => 'all']);
     }
 
     public function getUpdateView(string|int $id): RedirectResponse|View
