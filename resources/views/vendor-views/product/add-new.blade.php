@@ -279,7 +279,7 @@
                                                 ({{ getCurrencySymbol(currencyCode: getCurrencyCode()) }})</label>
 
                                             <span class="input-label-secondary cursor-pointer" data-toggle="tooltip"
-                                                title="{{ translate('set_the_selling_price_for_each_unit_of_this_product._This_Unit_Price_section_won’t_be_applied_if_you_set_a_variation_wise_price') }}.">
+                                                title="Set the unit price for each unit of this product. This unit price section will not be applied if you set a variation-wise price.">
                                                 <img src="{{ asset('public/assets/back-end/img/info-circle.svg') }}"
                                                     alt="">
                                             </span>

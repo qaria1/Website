@@ -38,7 +38,6 @@ use App\Contracts\Repositories\BusinessSettingRepositoryInterface;
 use App\Contracts\Repositories\FlashDealProductRepositoryInterface;
 use App\Models\DeliveryClass;
 use Illuminate\Support\Facades\Log;
-use function App\Utils\getCommissionPercent;
 
 class ProductController extends BaseController
 {
@@ -203,10 +202,6 @@ class ProductController extends BaseController
             $maxProductLifeTime = $activePlanRecord->max_product_lifecycle;
             $lifetimeEndDate = isset($maxProductLifeTime) ? \Carbon\Carbon::now()->addDays((int)$maxProductLifeTime) : NULL;
 
-            $price = $dataArray['unit_price'];
-            $commissionPercent = getCommissionPercent($price, $seller->id);
-            $dataArray['unit_price'] = $price + ($commissionPercent / 100) * $price;
-
             $dataArray['lifetime_end_date'] = $lifetimeEndDate;
             $savedProduct = $this->productRepo->add(data: $dataArray);
             $this->productRepo->addRelatedTags(request: $request, product: $savedProduct);
@@ -264,14 +259,6 @@ class ProductController extends BaseController
 
         $product = $this->productRepo->getFirstWhereWithoutGlobalScope(params: ['id' => $id], relations: ['translations']);
         $dataArray = $service->getUpdateProductData(request: $request, product: $product, updateBy: 'seller');
-
-        // 10% commission, product price will be displayed adding 105 of its price
-        // $defaultCommission = getWebConfig(name: 'sales_commission');
-        // $dataArray['unit_price'] = ($defaultCommission / 100) * $dataArray['unit_price'] + $dataArray['unit_price'];
-        $seller = Seller::findOrFail(auth('seller')->id());
-        $price = $dataArray['unit_price'];
-        $commissionPercent = getCommissionPercent($price, $seller->id);
-        $dataArray['unit_price'] = $price + ($commissionPercent / 100) * $price;
 
         $this->productRepo->update(id: $id, data: $dataArray);
         $this->productRepo->addRelatedTags(request: $request, product: $product);

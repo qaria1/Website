@@ -165,7 +165,7 @@
                                 <th>{{ translate('product Name') }}</th>
                                 <th class="text-right">{{ translate('product Type') }}</th>
                                 <th class="text-right">{{ translate('purchase_price') }}</th>
-                                <th class="text-right">{{ translate('selling_price') }}</th>
+                                <th class="text-right">{{ translate('unit_price') }}</th>
                                 <th class="text-center">{{ translate('verify_status') }}</th>
                                 <th class="text-center">{{ translate('active_status') }}</th>
                                 <th class="text-center">{{ translate('action') }}</th>

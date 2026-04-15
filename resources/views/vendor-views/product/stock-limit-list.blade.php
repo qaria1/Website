@@ -76,7 +76,7 @@
                                     <th>{{ translate('product_Name') }}</th>
                                     <th>{{ translate('product_Type') }}</th>
                                     <th>{{ translate('purchase_price') }}</th>
-                                    <th>{{ translate('selling_price') }}</th>
+                                    <th>{{ translate('unit_price') }}</th>
                                     <th>{{ translate('verify_status') }}</th>
                                     <th class="text-center">{{ translate('active_Status') }}</th>
                                     <th class="text-center">{{ translate('quantity') }}</th>

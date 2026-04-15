@@ -61,19 +61,6 @@
                     </div>
                 </div>
             </div>
-            <div class="col-12">
-                <div class="card card-body h-100 justify-content-center">
-                    <div class="d-flex gap-2 justify-content-between align-items-center">
-                        <div class="d-flex flex-column align-items-start">
-                            <h3 class="mb-1 fz-24">{{setCurrencySymbol(amount: usdToDefaultCurrency(amount: $dashboardData['adminCommission']), currencyCode: getCurrencyCode(type: 'default'))}}</h3>
-                            <div class="text-capitalize mb-0">{{translate('total_Commission_given')}}</div>
-                        </div>
-                        <div>
-                            <img width="40" src="{{asset('/public/assets/back-end/img/tcg.png')}}" alt="">
-                        </div>
-                    </div>
-                </div>
-            </div>
             <div class="col-md-6">
                 <div class="card card-body h-100 justify-content-center">
                     <div class="d-flex gap-2 justify-content-between align-items-center">
