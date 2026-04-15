@@ -13,10 +13,46 @@ use Illuminate\Support\Str;
 
 class LoginController extends Controller
 {
+    private function phoneCandidates(string $phone): array
+    {
+        $phone = trim($phone);
+        $digits = preg_replace('/\D+/', '', $phone);
+
+        $candidates = [
+            $phone,
+            ltrim($phone, '+'),
+            $digits,
+        ];
+
+        if ($digits !== '') {
+            $candidates[] = '+' . $digits;
+        }
+
+        if (strlen($digits) === 10 && str_starts_with($digits, '0')) {
+            $national = substr($digits, 1);
+            $candidates[] = '251' . $national;
+            $candidates[] = '+251' . $national;
+        }
+
+        if (strlen($digits) === 12 && str_starts_with($digits, '251')) {
+            $national = '0' . substr($digits, 3);
+            $candidates[] = $national;
+            $candidates[] = '+'.$digits;
+        }
+
+        if (strlen($digits) === 9) {
+            $candidates[] = '0' . $digits;
+            $candidates[] = '2519' . $digits;
+            $candidates[] = '+2519' . $digits;
+        }
+
+        return array_values(array_unique(array_filter($candidates)));
+    }
+
     public function login(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'email' => 'required',
+            'phone' => 'required',
             'password' => 'required|min:6'
         ]);
 
@@ -24,13 +60,14 @@ class LoginController extends Controller
             return response()->json(['errors' => Helpers::error_processor($validator)], 403);
         }
 
-        $data = [
-            'email' => $request->email,
-            'password' => $request->password
-        ];
+        $normalizedCandidates = $this->phoneCandidates((string) $request->phone);
 
-        $seller = Seller::where(['email' => $request['email']])->first();
-        if (isset($seller) && $seller['status'] == 'approved' && auth('seller')->attempt($data)) {
+        $seller = Seller::whereIn('phone', $normalizedCandidates)->first();
+
+        if (isset($seller) && $seller['status'] == 'approved' && auth('seller')->attempt([
+            'phone' => $seller->phone,
+            'password' => $request->password
+        ])) {
             $token = Str::random(50);
             Seller::where(['id' => auth('seller')->id()])->update(['auth_token' => $token]);
             if (SellerWallet::where('seller_id', $seller['id'])->first() == false) {

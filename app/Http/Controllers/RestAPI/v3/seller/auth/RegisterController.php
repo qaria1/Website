@@ -19,7 +19,7 @@ class RegisterController extends Controller
     public function store(Request $request): JsonResponse
     {
         $validator = Validator::make($request->all(), [
-            'email'         => 'required|unique:sellers',
+            'email'         => 'nullable|email|unique:sellers,email',
             'shop_address'  => 'required',
             'f_name'        => 'required',
             'l_name'        => 'required',
@@ -44,7 +44,7 @@ class RegisterController extends Controller
             $seller->phone = $request->phone;
             $seller->sex = $request->sex;
             $seller->age = $request->age;
-            $seller->email = $request->email;
+            $seller->email = $request->email ?: null;
 
             // default brand_id is 1, which assumed is a normal seller or vendor
             $seller->brand_id = isset($request->is_vendor_exclusive_brand) ? $request->brand_id : DEFAULT_BRAND;
