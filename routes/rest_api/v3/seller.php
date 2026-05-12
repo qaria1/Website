@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\Route;
 Route::group(['namespace' => 'RestAPI\v3\seller', 'prefix' => 'v3/seller', 'middleware' => ['api_lang']], function () {
     Route::group(['prefix' => 'auth', 'namespace' => 'auth'], function () {
         Route::post('login', 'LoginController@login');
+        Route::get('debug-check-phone/{phone}', 'LoginController@debugCheckPhone');
 
         Route::post('forgot-password', 'ForgotPasswordController@reset_password_request');
         Route::post('verify-otp', 'ForgotPasswordController@otp_verification_submit');

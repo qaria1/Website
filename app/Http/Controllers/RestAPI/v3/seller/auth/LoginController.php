@@ -75,6 +75,17 @@ class LoginController extends Controller
 
         $seller = Seller::whereIn('phone', $normalizedCandidates)->first();
 
+        if (!isset($seller)) {
+            Log::info('Login failed: seller not found', ['phone' => $request->phone]);
+        } elseif ($seller['status'] != 'approved') {
+            Log::info('Login failed: account not approved', ['phone' => $seller->phone, 'status' => $seller['status']]);
+        } elseif (!auth('seller')->attempt([
+            'phone' => $seller->phone,
+            'password' => $request->password
+        ])) {
+            Log::info('Login failed: wrong password', ['phone' => $seller->phone]);
+        }
+
         if (isset($seller) && $seller['status'] == 'approved' && auth('seller')->attempt([
             'phone' => $seller->phone,
             'password' => $request->password
@@ -102,5 +113,26 @@ class LoginController extends Controller
                 'errors' => $errors
             ], 401);
         }
+    }
+
+    public function debugCheckPhone($phone)
+    {
+        $digits = preg_replace('/\D+/', '', $phone);
+        $results = [
+            'input_phone' => $phone,
+            'digits' => $digits,
+            'digits_length' => strlen($digits),
+            'starts_with_9' => str_starts_with($digits, '9'),
+            'starts_with_251' => str_starts_with($digits, '251'),
+            'starts_with_0' => str_starts_with($digits, '0'),
+        ];
+
+        $candidates = $this->phoneCandidates($phone);
+        $results['candidates'] = $candidates;
+
+        $sellers = Seller::whereIn('phone', $candidates)->select('phone', 'status', 'f_name', 'l_name')->get();
+        $results['db_matches'] = $sellers;
+
+        return response()->json($results);
     }
 }
