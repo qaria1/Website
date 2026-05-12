@@ -37,13 +37,15 @@ class LoginController extends Controller
         if (strlen($digits) === 12 && str_starts_with($digits, '251')) {
             $national = '0' . substr($digits, 3);
             $candidates[] = $national;
-            $candidates[] = '+'.$digits;
+            $candidates[] = '+'. $digits;
+            // Also include raw 9-digit format for backwards compatibility
+            $candidates[] = substr($digits, 3);
         }
 
         if (strlen($digits) === 9) {
             $candidates[] = '0' . $digits;
-            $candidates[] = '2519' . $digits;
-            $candidates[] = '+2519' . $digits;
+            $candidates[] = '251' . $digits;
+            $candidates[] = '+251' . $digits;
         }
 
         return array_values(array_unique(array_filter($candidates)));

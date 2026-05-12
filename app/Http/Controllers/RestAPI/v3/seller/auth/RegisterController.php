@@ -41,7 +41,7 @@ class RegisterController extends Controller
             $seller = new Seller();
             $seller->f_name = $request->f_name;
             $seller->l_name = $request->l_name;
-            $seller->phone = $request->phone;
+            $seller->phone = $this->normalizePhone($request->phone);
             $seller->sex = $request->sex;
             $seller->age = $request->age;
             $seller->email = $request->email ?: null;
@@ -63,7 +63,7 @@ class RegisterController extends Controller
             $shop->seller_id = $seller->id;
             $shop->name = $request->shop_name;
             $shop->address = $request->shop_address;
-            $shop->contact = $request->phone;
+            $shop->contact = $this->normalizePhone($request->phone);
             $shop->image = ImageManager::upload('shop/', 'webp', $request->file('logo'));
             $shop->banner = ImageManager::upload('shop/banner/', 'webp', $request->file('banner'));
             $shop->bottom_banner = ImageManager::upload('shop/banner/', 'webp', $request->file('bottom_banner'));
@@ -183,5 +183,17 @@ class RegisterController extends Controller
             return response()->json(['message' => 'Shop apply fail!'], 403);
         }
 
+    }
+
+    private function normalizePhone(string $phone): string
+    {
+        $phone = trim($phone);
+        $digits = preg_replace('/\D+/', '', $phone);
+
+        if (strlen($digits) === 9 && str_starts_with($digits, '9')) {
+            return '251' . $digits;
+        }
+
+        return $phone;
     }
 }
