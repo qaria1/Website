@@ -9,6 +9,7 @@ use App\Utils\Helpers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 
 class LoginController extends Controller
@@ -40,6 +41,8 @@ class LoginController extends Controller
             $candidates[] = '+'. $digits;
             // Also include raw 9-digit format for backwards compatibility
             $candidates[] = substr($digits, 3);
+            // Include the canonical format stored in database
+            $candidates[] = $digits;
         }
 
         if (strlen($digits) === 9) {
@@ -63,6 +66,12 @@ class LoginController extends Controller
         }
 
         $normalizedCandidates = $this->phoneCandidates((string) $request->phone);
+
+        Log::info('Login attempt', [
+            'input_phone' => $request->phone,
+            'candidates' => $normalizedCandidates,
+            'db_match' => Seller::whereIn('phone', $normalizedCandidates)->pluck('phone', 'status')
+        ]);
 
         $seller = Seller::whereIn('phone', $normalizedCandidates)->first();
 
