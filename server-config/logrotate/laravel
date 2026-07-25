@@ -1,0 +1,11 @@
+﻿/var/www/html/martreza/storage/logs/*.log {
+    su www-data www-data
+    daily
+    missingok
+    rotate 7
+    compress
+    delaycompress
+    notifempty
+    create 0664 www-data www-data
+    sharedscripts
+}

@@ -1052,43 +1052,14 @@
                                         </li>
                                     </ul>
                                 </li>
-                            @endif
+                                @endif
 
-                            {{-- <li
-                                class="navbar-vertical-aside-has-menu {{ Request::is('admin/customer/' . Customer::SUBSCRIBER_LIST[URI]) ? 'active' : '' }}">
-                                <a class="nav-link " href="{{ route('admin.customer.subscriber-list') }}"
-                                    title="{{ translate('subscribers') }}">
-                                    <span class="tio-user nav-icon"></span>
-                                    <span class="text-truncate">{{ translate('subscribers') }} </span>
-                                </a>
-                            </li> --}}
-
-                            <li
-                                class="navbar-vertical-aside-has-menu {{ Request::is('admin/brand*') ? 'active' : '' }}">
-                                <a class="js-navbar-vertical-aside-menu-link nav-link nav-link-toggle"
-                                    href="javascript:" title="{{ translate('exclusive_brands') }}">
-                                    <i class="tio-star nav-icon"></i>
-                                    <span
-                                        class="navbar-vertical-aside-mini-mode-hidden-elements text-truncate">{{ translate('exclusive_brands') }}</span>
-                                </a>
-                                <ul class="js-navbar-vertical-aside-submenu nav nav-sub"
-                                    style="display: {{ Request::is('admin/brand*') ? 'block' : 'none' }}">
-                                    <li class="nav-item {{ Request::is('admin/brand/' . Brand::ADD[URI]) ? 'active' : '' }}"
-                                        title="{{ translate('add_new') }}">
-                                        <a class="nav-link " href="{{ route('admin.brand.add-new') }}">
-                                            <span class="tio-circle nav-indicator-icon"></span>
-                                            <span class="text-truncate">{{ translate('add_new') }}</span>
-                                        </a>
-                                    </li>
-                                    <li class="nav-item {{ Request::is('admin/brand/' . Brand::LIST[URI]) ? 'active' : '' }}"
-                                        title="{{ translate('list') }}">
-                                        <a class="nav-link " href="{{ route('admin.brand.list') }}">
-                                            <span class="tio-circle nav-indicator-icon"></span>
-                                            <span class="text-truncate">{{ translate('list') }}</span>
-                                        </a>
-                                    </li>
-                                </ul>
-                            </li>
+                                <li class="navbar-vertical-aside-has-menu {{ Request::is('admin/sellers/exclusive-brand*') ? 'active' : '' }}">
+                                    <a class="js-navbar-vertical-aside-menu-link nav-link" href="{{ route('admin.sellers.exclusive-brand.list') }}" title="{{ translate('exclusive_brands') }}">
+                                        <i class="tio-star nav-icon"></i>
+                                        <span class="navbar-vertical-aside-mini-mode-hidden-elements text-truncate">{{ translate('exclusive_brands') }}</span>
+                                    </a>
+                                </li>
 
                         @endif
                         @if (Helpers::module_permission_check('system_settings'))

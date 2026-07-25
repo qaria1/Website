@@ -14,7 +14,13 @@ $uri = urldecode(
 // This file allows us to emulate Apache's "mod_rewrite" functionality from the
 // built-in PHP web server. This provides a convenient way to test a Laravel
 // application without having installed a "real" web server software here.
+// This app's document root is the project root (matching production Apache),
+// so asset URLs include a /public/ prefix. Check the URI both with and without
+// the extra /public prefix to find the static file.
 if ($uri !== '/' && file_exists(__DIR__.'/public'.$uri)) {
+    return false;
+}
+if ($uri !== '/' && file_exists(__DIR__.$uri)) {
     return false;
 }
 

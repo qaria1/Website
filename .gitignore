@@ -16,3 +16,7 @@ yarn-error.log
 composer-setup.php
 .DS_Store
 /installation/*
+
+nul
+.kilo/
+server-config/secrets

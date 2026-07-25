@@ -110,6 +110,9 @@ function _defineProperty(e, t, r) {
                         });
         },
         stickyNavbar: function () {
+            if (document.body.classList.contains('shopview-body') || document.body.classList.contains('exclusive-brands-body')) {
+                return;
+            }
             var t = document.querySelector(".navbar-sticky");
             if (null != t) {
                 var e = t.classList,

@@ -95,6 +95,7 @@ use App\Http\Controllers\Admin\Promotion\BannerController;
 use App\Http\Controllers\Admin\Promotion\CouponController;
 use App\Http\Controllers\Admin\Settings\SiteMapController;
 use App\Http\Controllers\Admin\Customer\CustomerController;
+use App\Http\Controllers\Admin\UserManagement\ExclusiveBrandController;
 use App\Http\Controllers\Admin\Employee\EmployeeController;
 use App\Http\Controllers\Admin\Product\AttributeController;
 use App\Http\Controllers\Admin\Settings\CurrencyController;
@@ -465,6 +466,13 @@ Route::group(['prefix' => 'admin', 'as' => 'admin.', 'middleware' => ['admin']],
                 Route::post('/cancel-subscription', 'cancelSubscriptionPlan')->name('cancel');
                 Route::get('package_selected/{id}/{seller_id}', 'package_selected')->name('package_selected');
                 Route::post('package_renew_change_update', 'package_renew_change_update')->name('package_renew_change_update');
+            });
+        });
+
+        Route::group(['prefix' => 'exclusive-brand', 'as' => 'exclusive-brand.'], function () {
+            Route::controller(ExclusiveBrandController::class)->group(function () {
+                Route::get('/', 'index')->name('list');
+                Route::post('/update-status', 'updateStatus')->name('update-status');
             });
         });
 

@@ -44,7 +44,7 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register()
     {
-        if ($this->app->isLocal()) {
+        if ($this->app->isLocal() && class_exists(\Amirami\Localizator\ServiceProvider::class)) {
             $this->app->register(\Amirami\Localizator\ServiceProvider::class);
         }
     }

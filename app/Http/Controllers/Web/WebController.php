@@ -158,6 +158,47 @@ class WebController extends Controller
         }
     }
 
+    public function exclusive_brands(Request $request)
+    {
+        $shops = Shop::active()->exclusiveBrand()
+            ->with(['seller.product' => function ($q) {
+                $q->select(['id', 'user_id', 'name', 'slug', 'thumbnail', 'unit_price', 'discount', 'discount_type', 'category_id', 'brand_id', 'added_by', 'status', 'request_status'])->active();
+            }])
+            ->withCount(['products' => function ($q) {
+                $q->active();
+            }])
+            ->when($request->has('searchValue') && $request['searchValue'] != null, function ($query) use ($request) {
+                $keys = explode(' ', $request['searchValue']);
+                $query->where(function ($q) use ($keys) {
+                    foreach ($keys as $key) {
+                        $q->orWhere('name', 'like', '%' . $key . '%');
+                    }
+                });
+            })
+            ->latest()
+            ->paginate(12)
+            ->appends(['searchValue' => $request['searchValue']]);
+
+        $shops->getCollection()->map(function ($shop) {
+            $ratingTotal = 0;
+            $reviewCount = 0;
+            foreach ($shop->seller->product ?? [] as $product) {
+                foreach ($product->reviews ?? [] as $review) {
+                    if ($review->status == 1) {
+                        $ratingTotal += $review->rating;
+                        $reviewCount++;
+                    }
+                }
+            }
+            $shop->average_rating = $reviewCount > 0 ? ($ratingTotal / $reviewCount) : 0;
+            $shop->review_count = $reviewCount;
+            $shop->featured_products = $shop->seller->product?->take(4) ?? collect();
+            return $shop;
+        });
+
+        return view(VIEW_FILE_NAMES['exclusive_brands'], compact('shops'));
+    }
+
     public function all_sellers(Request $request)
     {
         $business_mode = Helpers::get_business_settings('business_mode');

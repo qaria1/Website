@@ -886,3 +886,12 @@ img, figure {
     direction: ltr;
 }
 
+/* Global Navigation Override: Always keep full yellow menu bar visible on scroll and hide the "Expand Menu" toggle */
+.navbar-sticky.navbar-stuck .navbar-stuck-menu {
+    display: block !important;
+}
+
+.navbar-stuck-toggler {
+    display: none !important;
+}
+

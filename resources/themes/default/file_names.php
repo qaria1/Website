@@ -49,6 +49,7 @@ return [
     'products_view_page'=>'web-views.products.view',
     'products__ajax_partials'=>'web-views.products._ajax-products',
     'all_brands'=>'web-views.products.brands',
+    'exclusive_brands'=>'web-views.seller-view.exclusive-brands',
     'contacts'=>'web-views.pages.contact-us',
     'flash_deals'=>'web-views.deals',
     'shop_view_page'=>'web-views.seller-view.shopview',

@@ -50,6 +50,7 @@ class Shop extends Model
         'vacation_status',
         'temporary_close',
         'banner',
+        'is_exclusive_brand',
     ];
 
     /**
@@ -61,6 +62,7 @@ class Shop extends Model
         'seller_id' => 'integer',
         'vacation_status' => 'boolean',
         'temporary_close' => 'boolean',
+        'is_exclusive_brand' => 'boolean',
     ];
 
     public function seller():BelongsTo
@@ -79,5 +81,10 @@ class Shop extends Model
         return $query->whereHas('seller', function ($query) {
             $query->where(['status' => 'approved']);
         });
+    }
+
+    public function scopeExclusiveBrand($query)
+    {
+        return $query->where('is_exclusive_brand', true);
     }
 }

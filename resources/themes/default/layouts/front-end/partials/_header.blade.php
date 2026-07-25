@@ -387,17 +387,25 @@
                                         </button>
                                         <div class="dropdown-menu __dropdown-menu-3 __min-w-165px text-align-direction"
                                              aria-labelledby="dropdownMenuButton">
-                                            <a class="dropdown-item text-capitalize" href="{{route('shop.apply')}}">
-                                                {{ translate('become_a_vendor')}}
+                                            <a class="dropdown-item" href="{{route('vendor.auth.login')}}">
+                                                <i class="fa fa-sign-in mr-2"></i> {{ translate('login')}}
                                             </a>
                                             <div class="dropdown-divider"></div>
-                                            <a class="dropdown-item" href="{{route('vendor.auth.login')}}">
-                                                {{ translate('vendor_login')}}
+                                            <a class="dropdown-item text-capitalize" href="{{route('shop.apply')}}">
+                                                <i class="fa fa-user-plus mr-2"></i> {{ translate('sign_up')}}
                                             </a>
                                         </div>
                                     </div>
                                 </li>
                             @endif
+                        @endif
+
+                        @if ($businessMode == 'multi')
+                            <li class="nav-item dropdown {{request()->is('exclusive-shops*')?'active':''}}">
+                                <a class="nav-link text-capitalize" href="{{route('exclusive-shops')}}">
+                                    <i class="tio-star mr-1"></i>{{ translate('exclusive_brands')}}
+                                </a>
+                            </li>
                         @endif
 
                         @php($adminLogin = getWebConfig(name: 'admin_login_url'))

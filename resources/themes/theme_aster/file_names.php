@@ -47,6 +47,7 @@ return [
     'products_view_page'=>'theme-views.product.view',
     'products__ajax_partials'=>'theme-views.product._ajax-products',
     'all_brands'=>'theme-views.product.brands',
+    'exclusive_brands'=>'theme-views.seller-views.exclusive-brands',
     'contacts'=>'theme-views.pages.contact-us',
     'flash_deals'=>'theme-views.product.flash-deals',
     'shop_view_page'=>'theme-views.seller-views.shopview',

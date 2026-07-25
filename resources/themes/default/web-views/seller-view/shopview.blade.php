@@ -25,14 +25,54 @@
 
     <meta property="og:description" content="{{ substr(strip_tags(str_replace('&nbsp;', ' ', $web_config['about']->value)),0,160) }}">
     <meta property="twitter:description" content="{{ substr(strip_tags(str_replace('&nbsp;', ' ', $web_config['about']->value)),0,160) }}">
+    
+    <style>
+        body.shopview-body header {
+            position: sticky !important;
+            top: 0 !important;
+            z-index: 1030 !important;
+            background: #fff !important;
+        }
+        body.shopview-body .navbar-sticky.navbar-stuck {
+            position: static !important;
+            box-shadow: none !important;
+            background: transparent !important;
+        }
+        .shopview-sticky-header-container {
+            position: sticky;
+            top: 0;
+            z-index: 1020;
+            background: #fff;
+            padding-bottom: 10px;
+        }
+        .shopview-products-grid .col-lg-12 .col-lg-3,
+        .shopview-products-grid #ajax-products > div {
+            flex: 0 0 20% !important;
+            max-width: 20% !important;
+        }
+        @media (max-width: 991px) {
+            .shopview-products-grid .col-lg-12 .col-lg-3,
+            .shopview-products-grid #ajax-products > div {
+                flex: 0 0 33.3333% !important;
+                max-width: 33.3333% !important;
+            }
+        }
+        @media (max-width: 575px) {
+            .shopview-products-grid .col-lg-12 .col-lg-3,
+            .shopview-products-grid #ajax-products > div {
+                flex: 0 0 50% !important;
+                max-width: 50% !important;
+            }
+        }
+    </style>
 @endpush
 
 @section('content')
 
     @php($decimalPointSettings = getWebConfig(name: 'decimal_point_settings'))
 
-    <div class="container py-4 __inline-67">
-        <div class="rtl">
+    <div class="shopview-page container py-4 __inline-67">
+        <div class="rtl shopview-sticky-header-container shadow-sm">
             <div class="bg-white __shop-banner-main">
                 @if($shop['id'] != 0)
                     <img class="__shop-page-banner" alt=""
@@ -162,10 +202,7 @@
 
         <div class="d-flex flex-wrap gap-3 justify-content-sm-between py-4 web-direction">
             <div class="d-flex flex-wrap justify-content-between align-items-center w-max-md-100 me-auto gap-3">
-                <h3 class="widget-title align-self-center font-bold __text-18px my-0">{{translate('categories')}}</h3>
-                <div class="filter-ico-button btn btn--primary p-2 m-0 d-lg-none d-flex align-items-center">
-                    <i class="tio-filter"></i>
-                </div>
+                <h3 class="widget-title align-self-center font-bold __text-18px my-0">{{translate('products')}}</h3>
             </div>
             <div class="d-flex flex-column flex-sm-row gap-3">
                 <form>
@@ -208,75 +245,8 @@
         </div>
 
 
-        <div class="row rtl">
-            <div class="col-lg-3 mr-0 pe-4">
-                <aside class="SearchParameters" id="SearchParameters">
-
-                    <div class="__shop-page-sidebar">
-                        <div class="cz-sidebar-header">
-                            <button class="shop-page-sidebar-close close ms-auto" type="button" data-dismiss="sidebar" aria-label="Close">
-                                <i class="tio-clear"></i>
-                            </button>
-                        </div>
-                        <div class="accordion __cate-side-arrordion">
-                            @foreach($categories as $category)
-                                <div class="menu--caret-accordion">
-
-                                <div class="card-header flex-between">
-                                    <div>
-                                        <label class="for-hover-label cursor-pointer get-view-by-onclick"
-                                        data-link="{{route('shopView',['id'=> $seller_id,'category_id'=>$category['id']])}}">
-                                            {{$category['name']}}
-                                        </label>
-                                    </div>
-                                    <div class="px-2 cursor-pointer menu--caret">
-                                        <strong class="pull-right for-brand-hover">
-                                            @if($category->childes->count()>0)
-                                                <i class="tio-next-ui fs-13"></i>
-                                            @endif
-                                        </strong>
-                                    </div>
-                                </div>
-                                <div class="card-body p-0 ms-2 d--none"
-                                        id="collapse-{{$category['id']}}">
-                                    @foreach($category->childes as $child)
-                                        <div class="menu--caret-accordion">
-                                            <div class="for-hover-label card-header flex-between">
-                                                <div>
-                                                    <label class="cursor-pointer get-view-by-onclick" data-link="{{ route('shopView',['id'=> $seller_id,'sub_category_id'=>$child['id']]) }}">
-                                                        {{$child['name']}}
-                                                    </label>
-                                                </div>
-                                                <div class="px-2 cursor-pointer menu--caret">
-                                                    <strong class="pull-right">
-                                                        @if($child->childes->count()>0)
-                                                            <i class="tio-next-ui fs-13"></i>
-                                                        @endif
-                                                    </strong>
-                                                </div>
-                                            </div>
-                                            <div class="card-body p-0 ms-2 d--none"
-                                                id="collapse-{{$child['id']}}">
-                                                @foreach($child->childes as $ch)
-                                                    <div class="card-header">
-                                                        <label class="for-hover-label d-block cursor-pointer text-left get-view-by-onclick"
-                                                        data-link="{{ route('shopView',['id'=> $seller_id,'sub_sub_category_id'=>$ch['id']])}}">
-                                                            {{$ch['name']}}
-                                                        </label>
-                                                    </div>
-                                                @endforeach
-                                            </div>
-                                        </div>
-                                    @endforeach
-                                </div>
-                                </div>
-                            @endforeach
-                        </div>
-                    </div>
-                </aside>
-            </div>
-
-            <div class="col-lg-9 product-div">
+        <div class="row rtl shopview-products-grid">
+            <div class="col-lg-12 product-div">
 
                 @if (count($products) > 0)
                     <div class="row g-3" id="ajax-products">
@@ -341,5 +311,20 @@
     <span id="store-request-data-category-id" data-value="{{ request('category_id') }}"></span>
     <span id="store-request-data-sub-category-id" data-value="{{ request('sub_category_id') }}"></span>
     <span id="store-request-data-sub-sub-category-id" data-value="{{ request('sub_sub_category_id') }}"></span>
-
 @endsection
+
+@push('script')
+    <script>
+        document.body.classList.add('shopview-body');
+        function syncShopViewSticky() {
+            var header = document.querySelector('header.box-shadow-sm');
+            var bannerContainer = document.querySelector('.shopview-sticky-header-container');
+            if (header && bannerContainer) {
+                bannerContainer.style.top = header.offsetHeight + 'px';
+            }
+        }
+        syncShopViewSticky();
+        window.addEventListener('resize', syncShopViewSticky);
+        window.addEventListener('scroll', syncShopViewSticky);
+    </script>
+@endpush
