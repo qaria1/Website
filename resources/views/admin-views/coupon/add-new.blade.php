@@ -88,6 +88,14 @@
                                            id="coupon_limit" class="form-control"
                                            placeholder="{{translate('ex')}}: 10">
                                 </div>
+                                <div class="col-md-6 col-lg-4 form-group first_order">
+                                    <label
+                                        for="limit_total"
+                                        class="title-color font-weight-medium d-flex">{{translate('total_usage_limit')}}</label>
+                                    <input type="number" name="limit_total" value="{{ old('limit_total', 0) }}" min="0"
+                                           id="limit_total" class="form-control"
+                                           placeholder="{{translate('ex')}}: 100 (0 = {{translate('unlimited')}})">
+                                </div>
                                 <div class="col-md-6 col-lg-4 form-group free_delivery">
                                     <label for="name"
                                            class="title-color font-weight-medium d-flex">{{translate('discount_type')}}</label>
@@ -108,7 +116,7 @@
                                 <div class="col-md-6 col-lg-4 form-group">
                                     <label for="name"
                                            class="title-color font-weight-medium d-flex">{{translate('minimum_purchase')}}
-                                        ($)</label>
+                                        ({{ getCurrencySymbol() }})</label>
                                     <input type="number" min="1" max="1000000" name="min_purchase"
                                            value="{{ old('min_purchase') }}" class="form-control"
                                            id="minimum purchase"
@@ -117,7 +125,7 @@
                                 <div class="col-md-6 col-lg-4 form-group free_delivery" id="max-discount">
                                     <label for="name"
                                            class="title-color font-weight-medium d-flex">{{translate('maximum_discount')}}
-                                        ($)</label>
+                                        ({{ getCurrencySymbol() }})</label>
                                     <input type="number" min="1" max="1000000" name="max_discount"
                                            value="{{ old('max_discount') }}"
                                            class="form-control" id="maximum discount"
@@ -254,13 +262,9 @@
                                         @endif
                                     </td>
                                     <td>
-                                        <span>{{translate('limit')}}:
-                                            <strong>{{ $coupon['limit'] }},</strong>
-                                        </span>
-
-                                        <span class="ml-1">{{translate('used')}}:
-                                            <strong>{{ $coupon['order_count'] }}</strong>
-                                        </span>
+                                        <div>{{translate('user_limit')}}: <strong>{{ $coupon['limit'] }}</strong></div>
+                                        <div>{{translate('total_limit')}}: <strong>{{ $coupon['limit_total'] > 0 ? $coupon['limit_total'] : translate('unlimited') }}</strong></div>
+                                        <div>{{translate('used')}}: <strong>{{ $coupon['total_used_count'] ?? $coupon['order_count'] }}</strong></div>
                                     </td>
                                     <td>{{ $coupon['coupon_bearer'] == 'inhouse' ? 'admin':$coupon['coupon_bearer'] }}</td>
                                     <td>

@@ -7683,4 +7683,8 @@
   'select_Vendor' => 'Select Vendor',
   'all_Vendor' => 'All Vendor',
   'ex:10' => 'Ex:10',
+  'minimum_purchase_requirement_not_met' => 'Minimum purchase requirement not met',
+  'total_usage_limit' => 'Total usage limit',
+  'unlimited' => 'Unlimited',
+  'total_limit' => 'Total limit',
 );

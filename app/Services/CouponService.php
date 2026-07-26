@@ -23,6 +23,7 @@ class CouponService
             'seller_id' => $addedBy == 'seller' ? auth('seller')->id() : null,
             'customer_id' => $request['customer_id'],
             'limit' => $request['limit'],
+            'limit_total' => $request['limit_total'] ?? 0,
             'min_purchase' => currencyConverter(amount: $request['min_purchase']),
             'discount_type' => $request['coupon_type'] == 'discount_on_purchase' ? $request['discount_type'] : 'amount',
             'discount' => $request['coupon_type'] == 'discount_on_purchase' ? ($request['discount_type'] == 'amount' ? currencyConverter(amount: $request['discount']) : $request['discount']) : 0,
@@ -41,6 +42,7 @@ class CouponService
             'start_date' => $request['start_date'],
             'expire_date' => $request['expire_date'],
             'status' => 1,
+            'limit_total' => $request['limit_total'] ?? 0,
             'min_purchase' => currencyConverter(amount: $request['min_purchase']),
         ];
 
@@ -74,6 +76,7 @@ class CouponService
             'start_date' => $request['start_date'],
             'expire_date' => $request['expire_date'],
             'status' => 1,
+            'limit_total' => $request['limit_total'] ?? 0,
             'min_purchase' => currencyConverter(amount: $request['min_purchase']),
         ];
         if ($request['coupon_type'] == 'discount_on_purchase' || $request['coupon_type'] == 'free_delivery') {

@@ -467,6 +467,7 @@ class OrderManager
             'coupon_type' => NULL,
         );
 
+        $coupon = null;
         if (!$is_guest && (isset($req['coupon_code']) && $req['coupon_code']) || session()->has('coupon_code')) {
             $coupon_code = $req['coupon_code'] ?? session('coupon_code');
             $coupon = Coupon::where(['code' => $coupon_code])
@@ -589,6 +590,15 @@ class OrderManager
 
 //        confirmed
         DB::table('orders')->insertGetId($or);
+        if ($coupon && $discount > 0) {
+            app(\App\Services\CouponValidationService::class)->recordRedemption(
+                coupon: $coupon,
+                orderId: $order_id,
+                customerId: (int)$customer_id,
+                discountAmount: (float)$discount,
+                bearer: (string)$coupon_bearer
+            );
+        }
         self::add_order_status_history($order_id, $customer_id, $data['payment_status'] == 'paid' ? 'confirmed' : 'pending', 'customer');
 
         foreach (CartManager::get_cart($data['cart_group_id']) as $c) {

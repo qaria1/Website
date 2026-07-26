@@ -40,6 +40,8 @@ class Coupon extends Model
         'discount',
         'discount_type',
         'limit',
+        'limit_total',
+        'total_used_count',
     ];
     protected $casts = [
         'id' => 'integer',
@@ -57,6 +59,8 @@ class Coupon extends Model
         'discount' => 'float',
         'discount_type' => 'string',
         'limit' => 'int',
+        'limit_total' => 'int',
+        'total_used_count' => 'int',
         'created_at' => 'datetime',
         'updated_at' => 'datetime',
     ];
@@ -66,8 +70,19 @@ class Coupon extends Model
         return $this->hasMany(Order::class, 'coupon_code', 'code');
     }
 
+    public function redemptions(): HasMany
+    {
+        return $this->hasMany(CouponRedemption::class);
+    }
+
+    public function targets(): HasMany
+    {
+        return $this->hasMany(CouponTarget::class);
+    }
+
     public function seller():BelongsTo
     {
         return $this->belongsTo(Seller::class);
     }
 }
+

@@ -74,6 +74,10 @@
                                 <label  for="exampleFormControlInput1" class="title-color text-capitalize">{{translate('limit_for_same_user')}}</label>
                                 <input type="number" name="limit" min="0" value="{{ $coupon['limit'] }}" id="coupon_limit" class="form-control" placeholder="{{translate('ex'.':'.'10')}}">
                             </div>
+                            <div class="col-md-6 col-lg-4 form-group first_order">
+                                <label  for="limit_total" class="title-color text-capitalize">{{translate('total_usage_limit')}}</label>
+                                <input type="number" name="limit_total" min="0" value="{{ $coupon['limit_total'] ?? 0 }}" id="limit_total" class="form-control" placeholder="{{translate('ex')}}: 100 (0 = {{translate('unlimited')}})">
+                            </div>
                             <div class="col-md-6 col-lg-4 form-group free_delivery">
                                 <label  for="name" class="title-color text-capitalize">{{translate('discount_type')}}</label>
                                 <select id="discount_type" class="form-control" name="discount_type">
@@ -87,12 +91,12 @@
                                     placeholder="{{translate('ex').':'.'500'}}" required>
                             </div>
                             <div class="col-md-6 col-lg-4 form-group">
-                                <label for="name" class="title-color text-capitalize">{{translate('minimum_purchase')}}</label>
+                                <label for="name" class="title-color text-capitalize">{{translate('minimum_purchase')}} ({{ getCurrencySymbol() }})</label>
                                 <input type="number" min="0" max="1000000" step=".01" name="min_purchase" class="form-control" id="minimum purchase" value="{{currencyConverter(amount:$coupon['min_purchase'])}}"
                                        placeholder="{{translate('minimum_purchase')}}" required>
                             </div>
                             <div class="col-md-6 col-lg-4 form-group free_delivery" id="max-discount">
-                                <label for="name" class="title-color text-capitalize">{{translate('maximum_discount')}}</label>
+                                <label for="name" class="title-color text-capitalize">{{translate('maximum_discount')}} ({{ getCurrencySymbol() }})</label>
                                 <input type="number" min="0" max="1000000" step=".01" name="max_discount" class="form-control" id="maximum discount" value="{{currencyConverter(amount:$coupon['max_discount'])}}"
                                        placeholder="{{translate('maximum_discount')}}">
                             </div>
