@@ -47,6 +47,12 @@ if (!function_exists('getDefaultLanguage')) {
             $lang = session('local');
         } else {
             $data = getWebConfig('language');
+            if (is_string($data)) {
+                $data = json_decode($data, true);
+            }
+            if (!is_array($data)) {
+                $data = [];
+            }
             $code = 'en';
             $direction = 'ltr';
             foreach ($data as $ln) {

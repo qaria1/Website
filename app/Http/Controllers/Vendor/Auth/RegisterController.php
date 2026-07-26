@@ -9,6 +9,7 @@ use App\Enums\SessionKey;
 use App\Models\BillingType;
 use App\Models\PlanBilling;
 use App\Utils\ImageManager;
+use App\Utils\SMS_module;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
@@ -45,10 +46,10 @@ class RegisterController extends Controller
         // dd($request->all());
         $request->validate(
             [
-                'image'             => 'required|mimes: jpg,jpeg,png,gif',
-                'logo'              => 'required|mimes: jpg,jpeg,png,gif',
-                'banner'            => 'required|mimes: jpg,jpeg,png,gif',
-                'bottom_banner'     => 'mimes: jpg,jpeg,png,gif',
+                'image'             => 'required|mimes:jpg,jpeg,png,gif,webp',
+                'logo'              => 'required|mimes:jpg,jpeg,png,gif,webp',
+                'banner'            => 'required|mimes:jpg,jpeg,png,gif,webp',
+                'bottom_banner'     => 'nullable|mimes:jpg,jpeg,png,gif,webp',
                 'email'             => 'required|unique:sellers',
                 'shop_address'      => 'required',
                 'f_name'            => 'required',
@@ -108,7 +109,7 @@ class RegisterController extends Controller
 
         */
 
-        DB::transaction(function ($r) use ($request) {
+        $seller = DB::transaction(function ($r) use ($request) {
             $seller = new Seller();
             $seller->f_name = $request->f_name;
             $seller->l_name = $request->l_name;
@@ -140,11 +141,12 @@ class RegisterController extends Controller
             $shop->bottom_banner = ImageManager::upload('shop/banner/', 'webp', $request->file('bottom_banner'));
             $shop->save();
 
-            // fixing chat feature
+            // fixing chat feature - provide attachment as valid JSON to satisfy json_valid() CHECK constraint
             \App\Models\Chatting::create([
                 'seller_id' => $seller->id,
                 'admin_id' => 0,
-                'message' => 'Hey ' . $seller->f_name . ' ' . $seller->l_name . ', Welcome to ' . env('APP_NAME') ?? ' our Platform!',
+                'message' => 'Hey ' . $seller->f_name . ' ' . $seller->l_name . ', Welcome to ' . (env('APP_NAME') ?? 'our Platform!'),
+                'attachment' => json_encode([]),
                 'sent_by_admin' => 1,
                 'shop_id' => $shop->id
             ]);
@@ -164,22 +166,29 @@ class RegisterController extends Controller
             // subscription plan related code here
             $defaultTrialPlan = null;
 
-            if ($request->from == 'seller' || isset($request->is_trial_plan)) {
+            if ($request->from == 'seller' || $request['from_submit'] == 'seller' || isset($request->is_trial_plan)) {
 
-                $trialPeriodExists = BusinessSetting::where('type', 'trial_period')->get();
-                if($trialPeriodExists->count() < 1){
+                // Use the admin-configured default subscription for new vendors
+                $newVendorDefaultRaw = BusinessSetting::where('type', 'new_vendor_default_subscription')->first();
 
-                    $tonaPlan = SubscriptionPlan::where('slug', 'tona')->first();
-                    BusinessSetting::create([
-                        'type' => 'trial_period',
-                        'value' => '{"plan_id":"'. $tonaPlan->id ?? 3 . '","validity":"60","price":"500","status":1}',
-                        'created_at' => now(),
-                        'updated_at' => now()
-                    ]);
+                if ($newVendorDefaultRaw) {
+                    $defaultTrialPlan = $newVendorDefaultRaw->toArray();
+                    $defaultTrialPlan['values'] = json_decode($defaultTrialPlan['value']);
+                } else {
+                    // Fallback: use trial_period setting
+                    $trialPeriodExists = BusinessSetting::where('type', 'trial_period')->get();
+                    if ($trialPeriodExists->count() < 1) {
+                        $tonaPlan = SubscriptionPlan::where('slug', 'tona')->first();
+                        BusinessSetting::create([
+                            'type' => 'trial_period',
+                            'value' => '{"plan_id":"'. ($tonaPlan->id ?? 3) . '","validity":"60","price":"500","status":1}',
+                            'created_at' => now(),
+                            'updated_at' => now()
+                        ]);
+                    }
+                    $defaultTrialPlan = BusinessSetting::where('type', 'trial_period')->first()?->toArray();
+                    $defaultTrialPlan['values'] = json_decode($defaultTrialPlan['value']);
                 }
-
-                $defaultTrialPlan = BusinessSetting::where('type', 'trial_period')->first()?->toArray();
-                $defaultTrialPlan['values'] = json_decode($defaultTrialPlan['value']);
             }
 
             $planId = $defaultTrialPlan ? $defaultTrialPlan['values']?->plan_id : $request->subscription_plan;
@@ -247,12 +256,21 @@ class RegisterController extends Controller
 
             $subscription_transaction->save();
 
+            return $seller;
         });
 
         if ($request['from_submit'] == 'seller') {
-            Toastr::success(translate('successfully_registered'), '', ['timeOut' => 10000]);
-            Toastr::success(translate('wait_for_your_request_to_be_approved'), '', ['timeOut' => 10000]);
-            return redirect()->route('home');
+            $token = rand(1000, 9999);
+            DB::table('phone_or_email_verifications')->updateOrInsert(
+                ['phone_or_email' => $seller->email],
+                ['token' => $token, 'created_at' => now(), 'updated_at' => now()]
+            );
+
+            SMS_module::send($seller->phone, $token);
+
+            Toastr::success(translate('successfully_registered'));
+            Toastr::success(translate('please_check_your_SMS_for_OTP'));
+            return redirect()->route('customer.auth.check', [$seller->id]);
         }
 
         if ($request->status == 'approved') {

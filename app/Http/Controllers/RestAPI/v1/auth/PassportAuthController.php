@@ -59,11 +59,12 @@ class PassportAuthController extends Controller
             'referred_by' => (isset($refer_user) && $refer_user) ? $refer_user->id : null,
         ]);
 
-        // fixing chat feature
+        // fixing chat feature - provide attachment as valid JSON to satisfy json_valid() CHECK constraint
         \App\Models\Chatting::create([
             'user_id' => $user->id,
             'admin_id' => 0,
-            'message' => 'Hey ' . $user->f_name . ' ' . $user->l_name . ', Welcome to ' . env('APP_NAME') ?? ' our Platform!',
+            'message' => 'Hey ' . $user->f_name . ' ' . $user->l_name . ', Welcome to ' . (env('APP_NAME') ?? 'our Platform!'),
+            'attachment' => json_encode([]),
             'sent_by_admin' => 1,
         ]);
 

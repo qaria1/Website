@@ -32,10 +32,14 @@
         @include('admin-views.business-settings.business-setup-inline-menu')
 
         <div class="card mt-3">
-            <div class="px-3 py-4">
+            <div class="px-3 py-4 d-flex align-items-center justify-content-between">
                 <h5 class="text-capitalize mb-0 d-flex align-items-center gap-2">
                     {{ translate('subscription_list') }}
                 </h5>
+                <a href="{{ route('admin.business-settings.subscription.add') }}"
+                    class="btn btn--primary btn-sm d-flex align-items-center gap-1">
+                    <i class="tio-add"></i> {{ translate('new_subscription') }}
+                </a>
             </div>
             <div class="table-responsive pb-3">
                 <table
@@ -128,56 +132,78 @@
             @endif
         </div>
 
-        <!-- <div class="card mt-3">
-            <div class="border-bottom px-4 py-3">
-                <h5 class="mb-0 text-capitalize d-flex align-items-center gap-2 text-capitalize">
-                    {{ translate('trial_subscription_setting') }}
+        <div class="card mt-3">
+            <div class="border-bottom px-4 py-3 d-flex align-items-center gap-2">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-primary"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                <h5 class="mb-0 text-capitalize d-flex align-items-center gap-2">
+                    {{ translate('new_vendor_default_subscription') }}
                 </h5>
             </div>
             <div class="card-body">
-                <form action="{{ route('admin.business-settings.subscription.trial-plan.update') }}" method="post" id="">
+                <p class="text-muted mb-3">
+                    {{ translate('select_the_subscription_plan_and_duration_that_will_automatically_be_assigned_to_all_newly_registered_vendors') }}
+                </p>
+                <form action="{{ route('admin.business-settings.subscription.new-vendor-default-plan.update') }}" method="post">
                     @csrf
-                    <div class="row align-items-end">
+                    <div class="row align-items-end g-3">
                         <div class="col-xl-4 col-md-6">
-                            <div class="">
-                                <label for="subscriptionPlan">{{ translate('subscription_type') }}</label>
-                                <select name="subscription_plan" class="form-control" id="subscriptionPlan" required>
-                                    <option disabled {{ isset($defaultTrialPlan) ? '' : 'selected' }} value="">
-                                        {{ translate('select_subscription') }}</option>
-                                    @foreach ($subscriptionPlans as $key => $plan)
-                                        <option
-                                            {{ isset($defaultTrialPlan) ? ($defaultTrialPlan['values']->plan_id == $plan->id ? 'selected' : '') : '' }}
-                                            value="{{ $plan->id }}">{{ $plan->name }}</option>
-                                    @endforeach
-                                </select>
-                            </div>
+                            <label for="newVendorSubscriptionPlan" class="form-label">
+                                {{ translate('subscription_plan') }}
+                                <span class="text-danger">*</span>
+                            </label>
+                            <select name="subscription_plan" class="form-control" id="newVendorSubscriptionPlan" required>
+                                <option disabled {{ isset($newVendorDefaultPlan) ? '' : 'selected' }} value="">
+                                    {{ translate('select_subscription_plan') }}
+                                </option>
+                                @foreach ($subscriptionPlans as $plan)
+                                    <option
+                                        value="{{ $plan->id }}"
+                                        {{ isset($newVendorDefaultPlan) && $newVendorDefaultPlan['values']->plan_id == $plan->id ? 'selected' : '' }}>
+                                        {{ $plan->name }}
+                                    </option>
+                                @endforeach
+                            </select>
                         </div>
                         <div class="col-xl-4 col-md-6">
-                            <div class="">
-                                <label for="plan_duration">
-                                    {{ translate('duration') }}: ({{ translate('in_days') }})
-                                    <span class="input-label-secondary cursor-pointer" data-toggle="tooltip"
-                                        data-placement="right"
-                                        title="{{ translate('please_make_sure_to_input_the_value_in_days') }}">
-                                        <img width="16"
-                                            src="{{ asset('/public/assets/back-end/img/info-circle.svg') }}"
-                                            alt="">
-                                    </span>
-                                </label>
-                                <input required
-                                    value="{{ isset($defaultTrialPlan) ? $defaultTrialPlan['values']->validity : '' }}"
-                                    name="plan_duration" id="planDuration" class="form-control" type="number"
-                                    placeholder="{{ translate('trial_duration_in_days') }}">
-                            </div>
+                            <label for="newVendorPlanDuration" class="form-label">
+                                {{ translate('duration') }} ({{ translate('in_days') }})
+                                <span class="text-danger">*</span>
+                                <span class="input-label-secondary cursor-pointer" data-toggle="tooltip" data-placement="right"
+                                    title="{{ translate('how_many_days_the_new_vendor_will_have_this_subscription_after_signing_up') }}">
+                                    <img width="16" src="{{ asset('/public/assets/back-end/img/info-circle.svg') }}" alt="">
+                                </span>
+                            </label>
+                            <input
+                                type="number"
+                                name="plan_duration"
+                                id="newVendorPlanDuration"
+                                class="form-control"
+                                min="1"
+                                required
+                                value="{{ isset($newVendorDefaultPlan) ? $newVendorDefaultPlan['values']->validity : '' }}"
+                                placeholder="{{ translate('e.g. 30, 60, 90') }}">
+                        </div>
+                        <div class="col-xl-4 col-md-6">
+                            <button type="submit" class="btn btn--primary px-4 w-100">
+                                <i class="tio-save mr-1"></i> {{ translate('save') }}
+                            </button>
                         </div>
                     </div>
-                    <div class="d-flex justify-content-end">
-                        <button type="submit" id="submit"
-                            class="btn btn--primary px-4">{{ translate('save') }}</button>
-                    </div>
+
+                    @if(isset($newVendorDefaultPlan))
+                        <div class="mt-3 p-3 bg-soft-success rounded d-flex align-items-center gap-2">
+                            <i class="tio-checkmark-circle text-success"></i>
+                            <span class="text-success">
+                                <strong>{{ translate('current_setting') }}:</strong>
+                                {{ $subscriptionPlans->where('id', $newVendorDefaultPlan['values']->plan_id)->first()?->name ?? translate('unknown_plan') }}
+                                &mdash;
+                                {{ $newVendorDefaultPlan['values']->validity }} {{ translate('days') }}
+                            </span>
+                        </div>
+                    @endif
                 </form>
             </div>
-        </div> -->
+        </div>
 
     </div>
 

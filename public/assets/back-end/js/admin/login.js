@@ -15,10 +15,12 @@ $(document).on('ready', function () {
 });
 
 $("#admin-login-form").on('submit', function (e) {
-    var response = grecaptcha.getResponse();
-    if (response.length === 0) {
-        e.preventDefault();
-        toastr.error($('#message-please-check-recaptcha').data('text'));
+    if (typeof grecaptcha !== 'undefined' && $('#recaptcha_element').length > 0) {
+        var response = grecaptcha.getResponse();
+        if (response.length === 0) {
+            e.preventDefault();
+            toastr.error($('#message-please-check-recaptcha').data('text'));
+        }
     }
 })
 

@@ -216,8 +216,8 @@ class ReportController extends Controller
         $earn_from_orders = Order::where(['order_status'=>'delivered', 'seller_is'=>$type])
             ->whereDate('updated_at', '>=', $start_date)
             ->whereDate('updated_at', '<=', $end_date)
-            ->selectRaw('(sum(order_amount) - sum(shipping_cost) + sum(CASE WHEN is_shipping_free=1 THEN extra_discount ELSE 0 END)) as earn_from_order, YEAR(updated_at) year, MONTH(updated_at) month, DAY(updated_at) day')
-            ->groupBy(DB::raw("DATE_FORMAT(updated_at, '%D')"))->latest('updated_at')->get();
+            ->selectRaw("(sum(order_amount) - sum(shipping_cost) + sum(CASE WHEN is_shipping_free=1 THEN extra_discount ELSE 0 END)) as earn_from_order, CAST(strftime('%Y', updated_at) AS INTEGER) year, CAST(strftime('%m', updated_at) AS INTEGER) month, CAST(strftime('%d', updated_at) AS INTEGER) day")
+            ->groupBy(DB::raw("strftime('%d', updated_at)"))->latest('updated_at')->get();
 
         for ($inc = $default_inc; $inc <= $number; $inc++) {
             $day = date('jS', strtotime("$year_month-$inc"));
@@ -238,11 +238,11 @@ class ReportController extends Controller
                     $query->where('seller_id', '!=', '0');
                 });
             })
-            ->selectRaw('sum(shipping_cost) as shipping_earn, YEAR(updated_at) year, MONTH(updated_at) month, DAY(updated_at) day')
+            ->selectRaw("sum(shipping_cost) as shipping_earn, CAST(strftime('%Y', updated_at) AS INTEGER) year, CAST(strftime('%m', updated_at) AS INTEGER) month, CAST(strftime('%d', updated_at) AS INTEGER) day")
             ->where(['order_type'=>'default_type', 'order_status'=>'delivered'])
             ->whereDate('updated_at', '>=', $start_date)
             ->whereDate('updated_at', '<=', $end_date)
-            ->groupBy(DB::raw("DATE_FORMAT(updated_at, '%D')"))
+            ->groupBy(DB::raw("strftime('%d', updated_at)"))
             ->latest('updated_at')->get();
 
         for ($inc = $default_inc; $inc <= $number; $inc++) {
@@ -259,8 +259,8 @@ class ReportController extends Controller
         $commissions = Order::where(['seller_is'=>'seller', 'order_status'=>'delivered'])
             ->whereDate('updated_at', '>=', $start_date)
             ->whereDate('updated_at', '<=', $end_date)
-            ->selectRaw('sum(admin_commission) as commission, YEAR(updated_at) year, MONTH(updated_at) month, DAY(updated_at) day')
-            ->groupBy(DB::raw("DATE_FORMAT(updated_at, '%D')"))
+            ->selectRaw("sum(admin_commission) as commission, CAST(strftime('%Y', updated_at) AS INTEGER) year, CAST(strftime('%m', updated_at) AS INTEGER) month, CAST(strftime('%d', updated_at) AS INTEGER) day")
+            ->groupBy(DB::raw("strftime('%d', updated_at)"))
             ->latest('updated_at')->get();
 
         for ($inc = $default_inc; $inc <= $number; $inc++) {
@@ -276,8 +276,8 @@ class ReportController extends Controller
         //commission
         $subscriptions = SubscriptionTransaction::whereDate('updated_at', '>=', $start_date)
         ->whereDate('updated_at', '<=', $end_date)
-        ->selectRaw('sum(paid_amount) as amount, YEAR(updated_at) year, MONTH(updated_at) month, DAY(updated_at) day')
-        ->groupBy(DB::raw("DATE_FORMAT(updated_at, '%D')"))
+        ->selectRaw("sum(paid_amount) as amount, CAST(strftime('%Y', updated_at) AS INTEGER) year, CAST(strftime('%m', updated_at) AS INTEGER) month, CAST(strftime('%d', updated_at) AS INTEGER) day")
+        ->groupBy(DB::raw("strftime('%d', updated_at)"))
         ->latest('updated_at')->get();
 
         for ($inc = $default_inc; $inc <= $number; $inc++) {
@@ -294,8 +294,8 @@ class ReportController extends Controller
         $admin_bearer_free_shippings = Order::where(['seller_is'=>'seller', 'order_status'=>'delivered'])
             ->whereDate('updated_at', '>=', $start_date)
             ->whereDate('updated_at', '<=', $end_date)
-            ->selectRaw('sum(CASE WHEN is_shipping_free=1 AND free_delivery_bearer="admin" THEN extra_discount ELSE 0 END) as free_shipping_admin_bearer, YEAR(updated_at) year, MONTH(updated_at) month, DAY(updated_at) day')
-            ->groupBy(DB::raw("DATE_FORMAT(updated_at, '%D')"))
+            ->selectRaw("sum(CASE WHEN is_shipping_free=1 AND free_delivery_bearer=\"admin\" THEN extra_discount ELSE 0 END) as free_shipping_admin_bearer, CAST(strftime('%Y', updated_at) AS INTEGER) year, CAST(strftime('%m', updated_at) AS INTEGER) month, CAST(strftime('%d', updated_at) AS INTEGER) day")
+            ->groupBy(DB::raw("strftime('%d', updated_at)"))
             ->latest('updated_at')->get();
 
         for ($inc = $default_inc; $inc <= $number; $inc++) {
@@ -318,8 +318,8 @@ class ReportController extends Controller
             })
             ->whereDate('updated_at', '>=', $start_date)
             ->whereDate('updated_at', '<=', $end_date)
-            ->selectRaw('(sum(CASE WHEN discount_type="coupon_discount" THEN discount_amount ELSE 0 END) + sum(CASE WHEN is_shipping_free=1 AND free_delivery_bearer="admin" THEN extra_discount ELSE 0 END)) as discount_amount, YEAR(updated_at) year, MONTH(updated_at) month, DAY(updated_at) day')
-            ->groupBy(DB::raw("DATE_FORMAT(updated_at, '%D')"))
+            ->selectRaw("(sum(CASE WHEN discount_type=\"coupon_discount\" THEN discount_amount ELSE 0 END) + sum(CASE WHEN is_shipping_free=1 AND free_delivery_bearer=\"admin\" THEN extra_discount ELSE 0 END)) as discount_amount, CAST(strftime('%Y', updated_at) AS INTEGER) year, CAST(strftime('%m', updated_at) AS INTEGER) month, CAST(strftime('%d', updated_at) AS INTEGER) day")
+            ->groupBy(DB::raw("strftime('%d', updated_at)"))
             ->latest('updated_at')->get();
 
         for ($inc = $default_inc; $inc <= $number; $inc++) {
@@ -336,8 +336,8 @@ class ReportController extends Controller
         $taxes = OrderTransaction::where(['seller_is'=> $type, 'status'=>'disburse'])
             ->whereDate('updated_at', '>=', $start_date)
             ->whereDate('updated_at', '<=', $end_date)
-            ->selectRaw('sum(tax) as total_tax, YEAR(updated_at) year, MONTH(updated_at) month, DAY(updated_at) day')
-            ->groupBy(DB::raw("DATE_FORMAT(updated_at, '%D')"))
+            ->selectRaw("sum(tax) as total_tax, CAST(strftime('%Y', updated_at) AS INTEGER) year, CAST(strftime('%m', updated_at) AS INTEGER) month, CAST(strftime('%d', updated_at) AS INTEGER) day")
+            ->groupBy(DB::raw("strftime('%d', updated_at)"))
             ->latest('updated_at')->get();
 
         for ($inc = $default_inc; $inc <= $number; $inc++) {
@@ -354,8 +354,8 @@ class ReportController extends Controller
         $refunds = RefundTransaction::where(['payment_status'=>'paid', 'paid_by'=> $type])
             ->whereDate('updated_at', '>=', $start_date)
             ->whereDate('updated_at', '<=', $end_date)
-            ->selectRaw('sum(amount) as refund_amount, YEAR(updated_at) year, MONTH(updated_at) month, DAY(updated_at) day')
-            ->groupBy(DB::raw("DATE_FORMAT(updated_at, '%D')"))
+            ->selectRaw("sum(amount) as refund_amount, CAST(strftime('%Y', updated_at) AS INTEGER) year, CAST(strftime('%m', updated_at) AS INTEGER) month, CAST(strftime('%d', updated_at) AS INTEGER) day")
+            ->groupBy(DB::raw("strftime('%d', updated_at)"))
             ->latest('updated_at')->get();
 
         for ($inc = $default_inc; $inc <= $number; $inc++) {
@@ -394,8 +394,8 @@ class ReportController extends Controller
             ->whereBetween('updated_at', [Carbon::now()->startOfWeek(), Carbon::now()->endOfWeek()])
             ->select(
                 DB::raw('(sum(order_amount) - sum(shipping_cost) + sum(CASE WHEN is_shipping_free=1 THEN extra_discount ELSE 0 END)) as earn_from_order'),
-                DB::raw("(DATE_FORMAT(updated_at, '%W')) as day")
-            )->groupBy(DB::raw("DATE_FORMAT(updated_at, '%D')"))->latest('updated_at')->get();
+                DB::raw("(CASE strftime('%w', updated_at) WHEN '0' THEN 'Sunday' WHEN '1' THEN 'Monday' WHEN '2' THEN 'Tuesday' WHEN '3' THEN 'Wednesday' WHEN '4' THEN 'Thursday' WHEN '5' THEN 'Friday' WHEN '6' THEN 'Saturday' END) as day")
+            )->groupBy(DB::raw("strftime('%d', updated_at)"))->latest('updated_at')->get();
 
         for ($inc = 0; $inc <= $number; $inc++) {
             $earn_from_order[$day_name[$inc]] = 0;
@@ -417,11 +417,11 @@ class ReportController extends Controller
             })
             ->select(
                 DB::raw('sum(shipping_cost) as shipping_earn'),
-                DB::raw("(DATE_FORMAT(updated_at, '%W')) as day")
+                DB::raw("(CASE strftime('%w', updated_at) WHEN '0' THEN 'Sunday' WHEN '1' THEN 'Monday' WHEN '2' THEN 'Tuesday' WHEN '3' THEN 'Wednesday' WHEN '4' THEN 'Thursday' WHEN '5' THEN 'Friday' WHEN '6' THEN 'Saturday' END) as day")
             )
             ->where(['order_type'=>'default_type', 'order_status'=>'delivered'])
             ->whereBetween('updated_at', [Carbon::now()->startOfWeek(), Carbon::now()->endOfWeek()])
-            ->groupBy(DB::raw("DATE_FORMAT(updated_at, '%D')"))
+            ->groupBy(DB::raw("strftime('%d', updated_at)"))
             ->latest('updated_at')->get();
 
         for ($inc = 0; $inc <= $number; $inc++) {
@@ -438,9 +438,9 @@ class ReportController extends Controller
             ->whereBetween('updated_at', [Carbon::now()->startOfWeek(), Carbon::now()->endOfWeek()])
             ->select(
                 DB::raw('sum(admin_commission) as commission'),
-                DB::raw("(DATE_FORMAT(updated_at, '%W')) as day")
+                DB::raw("(CASE strftime('%w', updated_at) WHEN '0' THEN 'Sunday' WHEN '1' THEN 'Monday' WHEN '2' THEN 'Tuesday' WHEN '3' THEN 'Wednesday' WHEN '4' THEN 'Thursday' WHEN '5' THEN 'Friday' WHEN '6' THEN 'Saturday' END) as day")
             )
-            ->groupBy(DB::raw("DATE_FORMAT(updated_at, '%D')"))
+            ->groupBy(DB::raw("strftime('%d', updated_at)"))
             ->latest('updated_at')->get();
 
         for ($inc = 0; $inc <= $number; $inc++) {
@@ -455,9 +455,9 @@ class ReportController extends Controller
         $subscriptions = SubscriptionTransaction::whereBetween('updated_at', [Carbon::now()->startOfWeek(), Carbon::now()->endOfWeek()])
         ->select(
             DB::raw('sum(paid_amount) as amount'),
-            DB::raw("(DATE_FORMAT(updated_at, '%W')) as day")
+            DB::raw("(CASE strftime('%w', updated_at) WHEN '0' THEN 'Sunday' WHEN '1' THEN 'Monday' WHEN '2' THEN 'Tuesday' WHEN '3' THEN 'Wednesday' WHEN '4' THEN 'Thursday' WHEN '5' THEN 'Friday' WHEN '6' THEN 'Saturday' END) as day")
         )
-        ->groupBy(DB::raw("DATE_FORMAT(updated_at, '%D')"))
+        ->groupBy(DB::raw("strftime('%d', updated_at)"))
         ->latest('updated_at')->get();
 
         for ($inc = 0; $inc <= $number; $inc++) {
@@ -474,9 +474,9 @@ class ReportController extends Controller
             ->whereBetween('updated_at', [Carbon::now()->startOfWeek(), Carbon::now()->endOfWeek()])
             ->select(
                 DB::raw('sum(CASE WHEN is_shipping_free=1 AND free_delivery_bearer="admin" THEN extra_discount ELSE 0 END) as free_shipping_admin_bearer'),
-                DB::raw("(DATE_FORMAT(updated_at, '%W')) as day")
+                DB::raw("(CASE strftime('%w', updated_at) WHEN '0' THEN 'Sunday' WHEN '1' THEN 'Monday' WHEN '2' THEN 'Tuesday' WHEN '3' THEN 'Wednesday' WHEN '4' THEN 'Thursday' WHEN '5' THEN 'Friday' WHEN '6' THEN 'Saturday' END) as day")
             )
-            ->groupBy(DB::raw("DATE_FORMAT(updated_at, '%D')"))
+            ->groupBy(DB::raw("strftime('%d', updated_at)"))
             ->latest('updated_at')->get();
 
         for ($inc = 0; $inc <= $number; $inc++) {
@@ -499,9 +499,9 @@ class ReportController extends Controller
             ->whereBetween('updated_at', [Carbon::now()->startOfWeek(), Carbon::now()->endOfWeek()])
             ->select(
                 DB::raw('(sum(CASE WHEN discount_type="coupon_discount" THEN discount_amount ELSE 0 END) + sum(CASE WHEN is_shipping_free=1 AND free_delivery_bearer="admin" THEN extra_discount ELSE 0 END)) as discount_amount'),
-                DB::raw("(DATE_FORMAT(updated_at, '%W')) as day")
+                DB::raw("(CASE strftime('%w', updated_at) WHEN '0' THEN 'Sunday' WHEN '1' THEN 'Monday' WHEN '2' THEN 'Tuesday' WHEN '3' THEN 'Wednesday' WHEN '4' THEN 'Thursday' WHEN '5' THEN 'Friday' WHEN '6' THEN 'Saturday' END) as day")
             )
-            ->groupBy(DB::raw("DATE_FORMAT(updated_at, '%D')"))
+            ->groupBy(DB::raw("strftime('%d', updated_at)"))
             ->latest('updated_at')->get();
 
         for ($inc = 0; $inc <= $number; $inc++) {
@@ -518,9 +518,9 @@ class ReportController extends Controller
             ->whereBetween('updated_at', [Carbon::now()->startOfWeek(), Carbon::now()->endOfWeek()])
             ->select(
                 DB::raw('sum(tax) as total_tax'),
-                DB::raw("(DATE_FORMAT(updated_at, '%W')) as day")
+                DB::raw("(CASE strftime('%w', updated_at) WHEN '0' THEN 'Sunday' WHEN '1' THEN 'Monday' WHEN '2' THEN 'Tuesday' WHEN '3' THEN 'Wednesday' WHEN '4' THEN 'Thursday' WHEN '5' THEN 'Friday' WHEN '6' THEN 'Saturday' END) as day")
             )
-            ->groupBy(DB::raw("DATE_FORMAT(updated_at, '%D')"))
+            ->groupBy(DB::raw("strftime('%d', updated_at)"))
             ->latest('updated_at')->get();
 
         for ($inc = 0; $inc <= $number; $inc++) {
@@ -537,9 +537,9 @@ class ReportController extends Controller
             ->whereBetween('updated_at', [Carbon::now()->startOfWeek(), Carbon::now()->endOfWeek()])
             ->select(
                 DB::raw('sum(amount) as refund_amount'),
-                DB::raw("(DATE_FORMAT(updated_at, '%W')) as day")
+                DB::raw("(CASE strftime('%w', updated_at) WHEN '0' THEN 'Sunday' WHEN '1' THEN 'Monday' WHEN '2' THEN 'Tuesday' WHEN '3' THEN 'Wednesday' WHEN '4' THEN 'Thursday' WHEN '5' THEN 'Friday' WHEN '6' THEN 'Saturday' END) as day")
             )
-            ->groupBy(DB::raw("DATE_FORMAT(updated_at, '%D')"))
+            ->groupBy(DB::raw("strftime('%d', updated_at)"))
             ->latest('updated_at')->get();
 
         for ($inc = 0; $inc <= $number; $inc++) {
@@ -570,8 +570,8 @@ class ReportController extends Controller
         $earn_from_orders = Order::where(['order_status'=>'delivered', 'seller_is'=>$type])
             ->whereDate('updated_at', '>=', $start_date)
             ->whereDate('updated_at', '<=', $end_date)
-            ->selectRaw('(sum(order_amount) - sum(shipping_cost) + sum(CASE WHEN is_shipping_free=1 THEN extra_discount ELSE 0 END)) as earn_from_order, YEAR(updated_at) year, MONTH(updated_at) month')
-            ->groupBy(DB::raw("DATE_FORMAT(updated_at, '%M')"))->latest('updated_at')->get();
+            ->selectRaw("(sum(order_amount) - sum(shipping_cost) + sum(CASE WHEN is_shipping_free=1 THEN extra_discount ELSE 0 END)) as earn_from_order, CAST(strftime('%Y', updated_at) AS INTEGER) year, CAST(strftime('%m', updated_at) AS INTEGER) month")
+            ->groupBy(DB::raw("strftime('%m', updated_at)"))->latest('updated_at')->get();
 
         for ($inc = $default_inc; $inc <= $number; $inc++) {
             $month = date("F", strtotime("2023-$inc-01"));
@@ -592,11 +592,11 @@ class ReportController extends Controller
                     $query->where('seller_id', '!=', '0');
                 });
             })
-            ->selectRaw('sum(shipping_cost) as shipping_earn, YEAR(updated_at) year, MONTH(updated_at) month')
+            ->selectRaw("sum(shipping_cost) as shipping_earn, CAST(strftime('%Y', updated_at) AS INTEGER) year, CAST(strftime('%m', updated_at) AS INTEGER) month")
             ->where(['order_type'=>'default_type', 'order_status'=>'delivered'])
             ->whereDate('updated_at', '>=', $start_date)
             ->whereDate('updated_at', '<=', $end_date)
-            ->groupBy(DB::raw("DATE_FORMAT(updated_at, '%M')"))
+            ->groupBy(DB::raw("strftime('%m', updated_at)"))
             ->latest('updated_at')->get();
 
         for ($inc = $default_inc; $inc <= $number; $inc++) {
@@ -613,8 +613,8 @@ class ReportController extends Controller
         $commissions = Order::where(['seller_is'=>'seller', 'order_status'=>'delivered'])
             ->whereDate('updated_at', '>=', $start_date)
             ->whereDate('updated_at', '<=', $end_date)
-            ->selectRaw('sum(admin_commission) as commission, YEAR(updated_at) year, MONTH(updated_at) month')
-            ->groupBy(DB::raw("DATE_FORMAT(updated_at, '%M')"))
+            ->selectRaw("sum(admin_commission) as commission, CAST(strftime('%Y', updated_at) AS INTEGER) year, CAST(strftime('%m', updated_at) AS INTEGER) month")
+            ->groupBy(DB::raw("strftime('%m', updated_at)"))
             ->latest('updated_at')->get();
 
         for ($inc = $default_inc; $inc <= $number; $inc++) {
@@ -630,8 +630,8 @@ class ReportController extends Controller
         //commission
         $subscriptions = SubscriptionTransaction::whereDate('updated_at', '>=', $start_date)
         ->whereDate('updated_at', '<=', $end_date)
-        ->selectRaw('sum(paid_amount) as amount, YEAR(updated_at) year, MONTH(updated_at) month')
-        ->groupBy(DB::raw("DATE_FORMAT(updated_at, '%M')"))
+        ->selectRaw("sum(paid_amount) as amount, CAST(strftime('%Y', updated_at) AS INTEGER) year, CAST(strftime('%m', updated_at) AS INTEGER) month")
+        ->groupBy(DB::raw("strftime('%m', updated_at)"))
         ->latest('updated_at')->get();
 
         for ($inc = $default_inc; $inc <= $number; $inc++) {
@@ -648,8 +648,8 @@ class ReportController extends Controller
         $admin_bearer_free_shippings = Order::where(['seller_is'=>'seller', 'order_status'=>'delivered'])
             ->whereDate('updated_at', '>=', $start_date)
             ->whereDate('updated_at', '<=', $end_date)
-            ->selectRaw('sum(CASE WHEN is_shipping_free=1 AND free_delivery_bearer="admin" THEN extra_discount ELSE 0 END) as free_shipping_admin_bearer, YEAR(updated_at) year, MONTH(updated_at) month')
-            ->groupBy(DB::raw("DATE_FORMAT(updated_at, '%M')"))
+            ->selectRaw("sum(CASE WHEN is_shipping_free=1 AND free_delivery_bearer=\"admin\" THEN extra_discount ELSE 0 END) as free_shipping_admin_bearer, CAST(strftime('%Y', updated_at) AS INTEGER) year, CAST(strftime('%m', updated_at) AS INTEGER) month")
+            ->groupBy(DB::raw("strftime('%m', updated_at)"))
             ->latest('updated_at')->get();
 
         for ($inc = $default_inc; $inc <= $number; $inc++) {
@@ -665,14 +665,14 @@ class ReportController extends Controller
         //discount_given
         $discounts_given = Order::where(['order_status'=>'delivered'])
             ->when($type=='admin', function ($query){
-                $query->selectRaw('(sum(CASE WHEN discount_type="coupon_discount" AND coupon_discount_bearer="inhouse" THEN discount_amount ELSE 0 END) + sum(CASE WHEN is_shipping_free=1 AND free_delivery_bearer="admin" THEN extra_discount ELSE 0 END)) as discount_amount, YEAR(updated_at) year, MONTH(updated_at) month');
+                $query->selectRaw("(sum(CASE WHEN discount_type=\"coupon_discount\" AND coupon_discount_bearer=\"inhouse\" THEN discount_amount ELSE 0 END) + sum(CASE WHEN is_shipping_free=1 AND free_delivery_bearer=\"admin\" THEN extra_discount ELSE 0 END)) as discount_amount, CAST(strftime('%Y', updated_at) AS INTEGER) year, CAST(strftime('%m', updated_at) AS INTEGER) month");
             })
             ->when($type=='seller', function ($query){
-                $query->selectRaw('(sum(CASE WHEN discount_type="coupon_discount" AND coupon_discount_bearer="seller" THEN discount_amount ELSE 0 END) + sum(CASE WHEN is_shipping_free=1 AND free_delivery_bearer="seller" THEN extra_discount ELSE 0 END)) as discount_amount, YEAR(updated_at) year, MONTH(updated_at) month');
+                $query->selectRaw("(sum(CASE WHEN discount_type=\"coupon_discount\" AND coupon_discount_bearer=\"seller\" THEN discount_amount ELSE 0 END) + sum(CASE WHEN is_shipping_free=1 AND free_delivery_bearer=\"seller\" THEN extra_discount ELSE 0 END)) as discount_amount, CAST(strftime('%Y', updated_at) AS INTEGER) year, CAST(strftime('%m', updated_at) AS INTEGER) month");
             })
             ->whereDate('updated_at', '>=', $start_date)
             ->whereDate('updated_at', '<=', $end_date)
-            ->groupBy(DB::raw("DATE_FORMAT(updated_at, '%M')"))
+            ->groupBy(DB::raw("strftime('%m', updated_at)"))
             ->latest('updated_at')->get();
 
         for ($inc = $default_inc; $inc <= $number; $inc++) {
@@ -689,8 +689,8 @@ class ReportController extends Controller
         $taxes = OrderTransaction::where(['status'=>'disburse', 'seller_is'=> $type])
             ->whereDate('updated_at', '>=', $start_date)
             ->whereDate('updated_at', '<=', $end_date)
-            ->selectRaw('sum(tax) as total_tax, YEAR(updated_at) year, MONTH(updated_at) month')
-            ->groupBy(DB::raw("DATE_FORMAT(updated_at, '%M')"))
+            ->selectRaw("sum(tax) as total_tax, CAST(strftime('%Y', updated_at) AS INTEGER) year, CAST(strftime('%m', updated_at) AS INTEGER) month")
+            ->groupBy(DB::raw("strftime('%m', updated_at)"))
             ->latest('updated_at')->get();
 
         for ($inc = $default_inc; $inc <= $number; $inc++) {
@@ -707,8 +707,8 @@ class ReportController extends Controller
         $refunds = RefundTransaction::where(['payment_status'=>'paid', 'paid_by'=> $type])
             ->whereDate('updated_at', '>=', $start_date)
             ->whereDate('updated_at', '<=', $end_date)
-            ->selectRaw('sum(amount) as refund_amount, YEAR(updated_at) year, MONTH(updated_at) month')
-            ->groupBy(DB::raw("DATE_FORMAT(updated_at, '%M')"))
+            ->selectRaw("sum(amount) as refund_amount, CAST(strftime('%Y', updated_at) AS INTEGER) year, CAST(strftime('%m', updated_at) AS INTEGER) month")
+            ->groupBy(DB::raw("strftime('%m', updated_at)"))
             ->latest('updated_at')->get();
 
         for ($inc = $default_inc; $inc <= $number; $inc++) {
@@ -740,8 +740,8 @@ class ReportController extends Controller
         $earn_from_orders = Order::where(['order_status'=>'delivered', 'seller_is'=>$type])
             ->whereDate('updated_at', '>=', $start_date)
             ->whereDate('updated_at', '<=', $end_date)
-            ->selectRaw('(sum(order_amount) - sum(shipping_cost) + sum(CASE WHEN is_shipping_free=1 THEN extra_discount ELSE 0 END)) as earn_from_order, YEAR(updated_at) year')
-            ->groupBy(DB::raw("DATE_FORMAT(updated_at, '%Y')"))->latest('updated_at')->get();
+            ->selectRaw("(sum(order_amount) - sum(shipping_cost) + sum(CASE WHEN is_shipping_free=1 THEN extra_discount ELSE 0 END)) as earn_from_order, CAST(strftime('%Y', updated_at) AS INTEGER) year")
+            ->groupBy(DB::raw("strftime('%Y', updated_at)"))->latest('updated_at')->get();
 
 
         for ($inc = $from_year; $inc <= $to_year; $inc++) {
@@ -765,8 +765,8 @@ class ReportController extends Controller
             ->where(['order_type'=>'default_type', 'order_status'=>'delivered', 'is_shipping_free'=>'0'])
             ->whereDate('updated_at', '>=', $start_date)
             ->whereDate('updated_at', '<=', $end_date)
-            ->selectRaw('sum(shipping_cost) as shipping_earn, YEAR(updated_at) year')
-            ->groupBy(DB::raw("DATE_FORMAT(updated_at, '%Y')"))
+            ->selectRaw("sum(shipping_cost) as shipping_earn, CAST(strftime('%Y', updated_at) AS INTEGER) year")
+            ->groupBy(DB::raw("strftime('%Y', updated_at)"))
             ->latest('updated_at')->get();
 
         for ($inc = $from_year; $inc <= $to_year; $inc++) {
@@ -782,8 +782,8 @@ class ReportController extends Controller
         $commissions = Order::where(['seller_is'=>'seller', 'order_status'=>'delivered'])
             ->whereDate('updated_at', '>=', $start_date)
             ->whereDate('updated_at', '<=', $end_date)
-            ->selectRaw('sum(admin_commission) as commission, YEAR(updated_at) year')
-            ->groupBy(DB::raw("DATE_FORMAT(updated_at, '%Y')"))
+            ->selectRaw("sum(admin_commission) as commission, CAST(strftime('%Y', updated_at) AS INTEGER) year")
+            ->groupBy(DB::raw("strftime('%Y', updated_at)"))
             ->latest('updated_at')->get();
 
         for ($inc = $from_year; $inc <= $to_year; $inc++) {
@@ -798,8 +798,8 @@ class ReportController extends Controller
         //commission
         $subscriptions = SubscriptionTransaction::whereDate('updated_at', '>=', $start_date)
         ->whereDate('updated_at', '<=', $end_date)
-        ->selectRaw('sum(paid_amount) as amount, YEAR(updated_at) year')
-        ->groupBy(DB::raw("DATE_FORMAT(updated_at, '%Y')"))
+        ->selectRaw("sum(paid_amount) as amount, CAST(strftime('%Y', updated_at) AS INTEGER) year")
+        ->groupBy(DB::raw("strftime('%Y', updated_at)"))
         ->latest('updated_at')->get();
 
         for ($inc = $from_year; $inc <= $to_year; $inc++) {
@@ -815,8 +815,8 @@ class ReportController extends Controller
         $admin_bearer_free_shippings = Order::where(['seller_is'=>'seller', 'order_status'=>'delivered'])
             ->whereDate('updated_at', '>=', $start_date)
             ->whereDate('updated_at', '<=', $end_date)
-            ->selectRaw('sum(CASE WHEN is_shipping_free=1 AND free_delivery_bearer="admin" THEN extra_discount ELSE 0 END) as free_shipping_admin_bearer, YEAR(updated_at) year')
-            ->groupBy(DB::raw("DATE_FORMAT(updated_at, '%Y')"))
+            ->selectRaw("sum(CASE WHEN is_shipping_free=1 AND free_delivery_bearer=\"admin\" THEN extra_discount ELSE 0 END) as free_shipping_admin_bearer, CAST(strftime('%Y', updated_at) AS INTEGER) year")
+            ->groupBy(DB::raw("strftime('%Y', updated_at)"))
             ->latest('updated_at')->get();
 
         for ($inc = $from_year; $inc <= $to_year; $inc++) {
@@ -838,8 +838,8 @@ class ReportController extends Controller
             })
             ->whereDate('updated_at', '>=', $start_date)
             ->whereDate('updated_at', '<=', $end_date)
-            ->selectRaw('(sum(CASE WHEN discount_type="coupon_discount" THEN discount_amount ELSE 0 END) + sum(CASE WHEN is_shipping_free=1 AND free_delivery_bearer="admin" THEN extra_discount ELSE 0 END)) as discount_amount, YEAR(updated_at) year')
-            ->groupBy(DB::raw("DATE_FORMAT(updated_at, '%Y')"))
+            ->selectRaw("(sum(CASE WHEN discount_type=\"coupon_discount\" THEN discount_amount ELSE 0 END) + sum(CASE WHEN is_shipping_free=1 AND free_delivery_bearer=\"admin\" THEN extra_discount ELSE 0 END)) as discount_amount, CAST(strftime('%Y', updated_at) AS INTEGER) year")
+            ->groupBy(DB::raw("strftime('%Y', updated_at)"))
             ->latest('updated_at')->get();
 
         for ($inc = $from_year; $inc <= $to_year; $inc++) {
@@ -855,8 +855,8 @@ class ReportController extends Controller
         $taxes = OrderTransaction::where(['status'=>'disburse', 'seller_is'=> $type])
             ->whereDate('updated_at', '>=', $start_date)
             ->whereDate('updated_at', '<=', $end_date)
-            ->selectRaw('sum(tax) as total_tax, YEAR(updated_at) year')
-            ->groupBy(DB::raw("DATE_FORMAT(updated_at, '%Y')"))
+            ->selectRaw("sum(tax) as total_tax, CAST(strftime('%Y', updated_at) AS INTEGER) year")
+            ->groupBy(DB::raw("strftime('%Y', updated_at)"))
             ->latest('updated_at')->get();
 
         for ($inc = $from_year; $inc <= $to_year; $inc++) {
@@ -872,8 +872,8 @@ class ReportController extends Controller
         $refunds = RefundTransaction::where(['payment_status'=>'paid', 'paid_by'=> $type])
             ->whereDate('updated_at', '>=', $start_date)
             ->whereDate('updated_at', '<=', $end_date)
-            ->selectRaw('sum(amount) as refund_amount, YEAR(updated_at) year')
-            ->groupBy(DB::raw("DATE_FORMAT(updated_at, '%Y')"))
+            ->selectRaw("sum(amount) as refund_amount, CAST(strftime('%Y', updated_at) AS INTEGER) year")
+            ->groupBy(DB::raw("strftime('%Y', updated_at)"))
             ->latest('updated_at')->get();
 
         for ($inc = $from_year; $inc <= $to_year; $inc++) {
@@ -1082,7 +1082,7 @@ class ReportController extends Controller
         $seller_earnings_commission = Order::where(['order_status'=>'delivered', 'seller_is'=>'seller'])
             ->whereDate('updated_at', '>=', $start_date)
             ->whereDate('updated_at', '<=', $end_date)
-            ->selectRaw('seller_id, (sum(order_amount) - sum(shipping_cost) + sum(CASE WHEN is_shipping_free=1 AND free_delivery_bearer="admin" THEN extra_discount ELSE 0 END)) as earn_from_order, sum(admin_commission) as admin_commission, seller_id, YEAR(updated_at) year, MONTH(updated_at) month')
+            ->selectRaw("seller_id, (sum(order_amount) - sum(shipping_cost) + sum(CASE WHEN is_shipping_free=1 AND free_delivery_bearer=\"admin\" THEN extra_discount ELSE 0 END)) as earn_from_order, sum(admin_commission) as admin_commission, seller_id, CAST(strftime('%Y', updated_at) AS INTEGER) year, CAST(strftime('%m', updated_at) AS INTEGER) month")
             ->groupBy('seller_id')->latest('updated_at')->get();
 
         $seller_earn_table = array();
@@ -1105,7 +1105,7 @@ class ReportController extends Controller
         $discount_given_bearer_admin = Order::where(['coupon_discount_bearer'=>'inhouse', 'discount_type'=>'coupon_discount','order_status'=>'delivered'])
             ->whereDate('updated_at', '>=', $start_date)
             ->whereDate('updated_at', '<=', $end_date)
-            ->selectRaw('sum(discount_amount) as discount_amount, seller_id, YEAR(updated_at) year, MONTH(updated_at) month')
+            ->selectRaw("sum(discount_amount) as discount_amount, seller_id, CAST(strftime('%Y', updated_at) AS INTEGER) year, CAST(strftime('%m', updated_at) AS INTEGER) month")
             ->groupBy('seller_id')
             ->latest('updated_at')->get();
 
@@ -1129,7 +1129,7 @@ class ReportController extends Controller
             ])
             ->whereDate('updated_at', '>=', $start_date)
             ->whereDate('updated_at', '<=', $end_date)
-            ->selectRaw('(sum(CASE WHEN is_shipping_free=0 THEN shipping_cost ELSE 0 END) + sum(CASE WHEN is_shipping_free=1 THEN extra_discount ELSE 0 END)) as shipping_earn, seller_id, YEAR(updated_at) year, MONTH(updated_at) month')
+            ->selectRaw("(sum(CASE WHEN is_shipping_free=0 THEN shipping_cost ELSE 0 END) + sum(CASE WHEN is_shipping_free=1 THEN extra_discount ELSE 0 END)) as shipping_earn, seller_id, CAST(strftime('%Y', updated_at) AS INTEGER) year, CAST(strftime('%m', updated_at) AS INTEGER) month")
             ->groupBy('seller_id')
             ->latest('updated_at')->get();
 
@@ -1146,7 +1146,7 @@ class ReportController extends Controller
         $discounts_given = Order::where(['order_status'=>'delivered'])
             ->whereDate('updated_at', '>=', $start_date)
             ->whereDate('updated_at', '<=', $end_date)
-            ->selectRaw('(sum(CASE WHEN coupon_discount_bearer="seller" AND discount_type="coupon_discount" THEN discount_amount ELSE 0 END) + sum(CASE WHEN is_shipping_free=1 AND free_delivery_bearer="seller" THEN extra_discount ELSE 0 END)) as discount_amount, seller_id, YEAR(updated_at) year, MONTH(updated_at) month')
+            ->selectRaw("(sum(CASE WHEN coupon_discount_bearer=\"seller\" AND discount_type=\"coupon_discount\" THEN discount_amount ELSE 0 END) + sum(CASE WHEN is_shipping_free=1 AND free_delivery_bearer=\"seller\" THEN extra_discount ELSE 0 END)) as discount_amount, seller_id, CAST(strftime('%Y', updated_at) AS INTEGER) year, CAST(strftime('%m', updated_at) AS INTEGER) month")
             ->groupBy('seller_id')
             ->latest('updated_at')->get();
 
@@ -1163,7 +1163,7 @@ class ReportController extends Controller
         $taxes = OrderTransaction::where(['seller_is'=>'seller', 'status'=>'disburse'])
             ->whereDate('updated_at', '>=', $start_date)
             ->whereDate('updated_at', '<=', $end_date)
-            ->selectRaw('sum(tax) as total_tax, seller_id, YEAR(updated_at) year, MONTH(updated_at) month')
+            ->selectRaw("sum(tax) as total_tax, seller_id, CAST(strftime('%Y', updated_at) AS INTEGER) year, CAST(strftime('%m', updated_at) AS INTEGER) month")
             ->groupBy('seller_id')
             ->latest('updated_at')->get();
 
@@ -1180,7 +1180,7 @@ class ReportController extends Controller
         $refunds = RefundTransaction::where(['payment_status'=>'paid','paid_by'=>'seller'])
             ->whereDate('updated_at', '>=', $start_date)
             ->whereDate('updated_at', '<=', $end_date)
-            ->selectRaw('sum(amount) as refund_amount, payer_id, YEAR(updated_at) year')
+            ->selectRaw("sum(amount) as refund_amount, payer_id, CAST(strftime('%Y', updated_at) AS INTEGER) year")
             ->groupBy('payer_id')
             ->latest('updated_at')->get();
 

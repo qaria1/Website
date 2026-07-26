@@ -13,7 +13,8 @@ class CommissionRule extends Model
         'seller_id',
         'min_price',
         'max_price',
-        'commission_percent'
+        'commission_percent',
+        'status'
     ];
     public function seller()
     {

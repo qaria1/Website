@@ -183,8 +183,8 @@ class ProductReportController extends Controller
     {
 
         $products = self::all_product_date_common_query($request, $start_date, $end_date)
-            ->selectRaw('count(*) as total_product, YEAR(created_at) year, MONTH(created_at) month')
-            ->groupBy(DB::raw("DATE_FORMAT(created_at, '%M')"))
+            ->selectRaw("count(*) as total_product, CAST(strftime('%Y', created_at) AS INTEGER) year, CAST(strftime('%m', created_at) AS INTEGER) month")
+            ->groupBy(DB::raw("strftime('%m', created_at)"))
             ->latest('created_at')->get();
 
         for ($inc = $default_inc; $inc <= $number; $inc++) {
@@ -208,8 +208,8 @@ class ProductReportController extends Controller
         $month = date("F", strtotime("$year_month"));
 
         $products = self::all_product_date_common_query($request, $start_date, $end_date)
-            ->selectRaw('count(*) as total_product, YEAR(updated_at) year, MONTH(created_at) month, DAY(created_at) day')
-            ->groupBy(DB::raw("DATE_FORMAT(created_at, '%D')"))
+            ->selectRaw("count(*) as total_product, CAST(strftime('%Y', updated_at) AS INTEGER) year, CAST(strftime('%m', created_at) AS INTEGER) month, CAST(strftime('%d', created_at) AS INTEGER) day")
+            ->groupBy(DB::raw("strftime('%d', created_at)"))
             ->latest('created_at')->get();
 
         for ($inc = $default_inc; $inc <= $number; $inc++) {
@@ -242,9 +242,9 @@ class ProductReportController extends Controller
         $products = self::all_product_date_common_query($request, $start_date, $end_date)
             ->select(
                 DB::raw('count(*) as total_product'),
-                DB::raw("(DATE_FORMAT(created_at, '%W')) as day")
+                DB::raw("(CASE strftime('%w', created_at) WHEN '0' THEN 'Sunday' WHEN '1' THEN 'Monday' WHEN '2' THEN 'Tuesday' WHEN '3' THEN 'Wednesday' WHEN '4' THEN 'Thursday' WHEN '5' THEN 'Friday' WHEN '6' THEN 'Saturday' END) as day")
             )
-            ->groupBy(DB::raw("DATE_FORMAT(created_at, '%D')"))
+            ->groupBy(DB::raw("strftime('%d', created_at)"))
             ->latest('created_at')->get();
 
         for ($inc = 0; $inc <= $number; $inc++) {
@@ -265,8 +265,8 @@ class ProductReportController extends Controller
     {
 
         $products = self::all_product_date_common_query($request, $start_date, $end_date)
-            ->selectRaw('count(*) as total_product, YEAR(created_at) year')
-            ->groupBy(DB::raw("DATE_FORMAT(created_at, '%Y')"))
+            ->selectRaw("count(*) as total_product, CAST(strftime('%Y', created_at) AS INTEGER) year")
+            ->groupBy(DB::raw("strftime('%Y', created_at)"))
             ->latest('created_at')->get();
 
         for ($inc = $from_year; $inc <= $to_year; $inc++) {

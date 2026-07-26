@@ -23,6 +23,7 @@ use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\View;
 use Illuminate\Support\ServiceProvider;
@@ -47,6 +48,21 @@ class AppServiceProvider extends ServiceProvider
         if ($this->app->isLocal() && class_exists(\Amirami\Localizator\ServiceProvider::class)) {
             $this->app->register(\Amirami\Localizator\ServiceProvider::class);
         }
+
+        $this->app->extend('url', function ($url, $app) {
+            return new class($app['router']->getRoutes(), $app['request'], $app['config']->get('app.asset_url')) extends \Illuminate\Routing\UrlGenerator {
+                public function asset($path, $secure = null)
+                {
+                    if (defined('DOMAIN_POINTED_DIRECTORY') && DOMAIN_POINTED_DIRECTORY === 'public') {
+                        if (str_starts_with($path, 'public/')) {
+                            $path = substr($path, 7);
+                        }
+                        $path = str_replace('storage/app/public', 'storage', $path);
+                    }
+                    return parent::asset($path, $secure);
+                }
+            };
+        });
     }
 
     /**
@@ -57,6 +73,25 @@ class AppServiceProvider extends ServiceProvider
 
     public function boot()
     {
+        if (DB::getDriverName() === 'sqlite') {
+            try {
+                $pdo = DB::connection()->getPdo();
+                $pdo->sqliteCreateFunction('YEAR', function ($date) {
+                    return $date ? date('Y', strtotime($date)) : null;
+                });
+                $pdo->sqliteCreateFunction('MONTH', function ($date) {
+                    return $date ? date('m', strtotime($date)) : null;
+                });
+                $pdo->sqliteCreateFunction('DAY', function ($date) {
+                    return $date ? date('d', strtotime($date)) : null;
+                });
+                $pdo->sqliteCreateFunction('IFNULL', function ($val, $default) {
+                    return $val !== null ? $val : $default;
+                });
+            } catch (\Throwable $e) {
+            }
+        }
+
         Paginator::useBootstrap();
 
         Config::set('addon_admin_routes',$this->get_addon_admin_routes());
@@ -69,7 +104,10 @@ class AppServiceProvider extends ServiceProvider
 
             $web = BusinessSetting::all();
             $settings = Helpers::get_settings($web, 'colors');
-            $data = json_decode($settings['value'], true);
+            $data = isset($settings['value']) ? json_decode($settings['value'], true) : [];
+            if (!is_array($data)) {
+                $data = [];
+            }
 
             // create trial_period data if not exists
             $trialPeriodExists = BusinessSetting::where('type', 'trial_period')->get();
@@ -111,9 +149,9 @@ class AppServiceProvider extends ServiceProvider
             }
 
             $web_config = [
-                'primary_color' => $data['primary'],
-                'secondary_color' => $data['secondary'],
-                'primary_color_light' => isset($data['primary_light']) ? $data['primary_light'] : '',
+                'primary_color' => $data['primary'] ?? '#3474da',
+                'secondary_color' => $data['secondary'] ?? '#f3f3f3',
+                'primary_color_light' => $data['primary_light'] ?? '',
                 'name' => Helpers::get_settings($web, 'company_name'),
                 'phone' => Helpers::get_settings($web, 'company_phone'),
                 'web_logo' => Helpers::get_settings($web, 'company_web_logo'),
@@ -124,7 +162,7 @@ class AppServiceProvider extends ServiceProvider
                 'footer_logo' => Helpers::get_settings($web, 'company_footer_logo'),
                 'copyright_text' => Helpers::get_settings($web, 'company_copyright_text'),
                 'decimal_point_settings' => !empty(\App\Utils\Helpers::get_business_settings('decimal_point_settings')) ? \App\Utils\Helpers::get_business_settings('decimal_point_settings') : 0,
-                'seller_registration' => BusinessSetting::where(['type'=>'seller_registration'])->first()->value,
+                'seller_registration' => BusinessSetting::where(['type'=>'seller_registration'])->first()?->value ?? 1,
                 'wallet_status' => Helpers::get_business_settings('wallet_status'),
                 'loyalty_point_status' => Helpers::get_business_settings('loyalty_point_status'),
                 'guest_checkout_status' => Helpers::get_business_settings('guest_checkout'),
@@ -175,11 +213,13 @@ class AppServiceProvider extends ServiceProvider
                     })->take(9)->get();
 
                     $recaptcha = Helpers::get_business_settings('recaptcha');
-                    $socials_login = Helpers::get_business_settings('social_login');
+                    $socials_login = Helpers::get_business_settings('social_login') ?? [];
                     $social_login_text = false;
-                    foreach ($socials_login as $socialLoginService) {
-                        if (isset($socialLoginService) && $socialLoginService['status'] == true) {
-                            $social_login_text = true;
+                    if (is_array($socials_login) || is_iterable($socials_login)) {
+                        foreach ($socials_login as $socialLoginService) {
+                            if (isset($socialLoginService) && isset($socialLoginService['status']) && $socialLoginService['status'] == true) {
+                                $social_login_text = true;
+                            }
                         }
                     }
 
@@ -247,7 +287,7 @@ class AppServiceProvider extends ServiceProvider
                             'tags' => $tags,
                             'features_section' => $features_section,
                             'total_discount_products' => $total_discount_products,
-                            'products_stock_limit' => Helpers::get_settings($web, 'stock_limit')->value,
+                            'products_stock_limit' => Helpers::get_settings($web, 'stock_limit')?->value ?? 10,
                         ];
                     }
                 }
@@ -263,7 +303,7 @@ class AppServiceProvider extends ServiceProvider
                 Schema::defaultStringLength(191);
             }
         }catch (\Exception $exception){
-
+            \Illuminate\Support\Facades\Log::error('AppServiceProvider boot error: ' . $exception->getMessage() . ' at ' . $exception->getFile() . ':' . $exception->getLine());
         }
 
         /**

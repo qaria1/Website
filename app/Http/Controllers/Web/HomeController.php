@@ -55,7 +55,7 @@ class HomeController extends Controller
     public function default_theme()
     {
         $theme_name = theme_root_path();
-        $brand_setting = BusinessSetting::where('type', 'product_brand')->first()->value;
+        $brand_setting = BusinessSetting::where('type', 'product_brand')->first()?->value ?? 1;
         $home_categories = Category::where('home_status', true)->priority()->get();
         $home_categories->map(function ($data) {
             $id = '"' . $data['id'] . '"';

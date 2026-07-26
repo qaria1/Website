@@ -69,11 +69,12 @@ class RegisterController extends Controller
             $shop->bottom_banner = ImageManager::upload('shop/banner/', 'webp', $request->file('bottom_banner'));
             $shop->save();
 
-            // fixing chat feature
+            // fixing chat feature - provide attachment as valid JSON to satisfy json_valid() CHECK constraint
             \App\Models\Chatting::create([
                 'seller_id' => $seller->id,
                 'admin_id' => 0,
-                'message' => 'Hey ' . $seller->f_name . ' ' . $seller->l_name . ', Welcome to ' . env('APP_NAME') ?? ' our Platform!',
+                'message' => 'Hey ' . $seller->f_name . ' ' . $seller->l_name . ', Welcome to ' . (env('APP_NAME') ?? 'our Platform!'),
+                'attachment' => json_encode([]),
                 'sent_by_admin' => 1,
                 'shop_id' => $shop->id
             ]);

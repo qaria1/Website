@@ -175,6 +175,7 @@ Route::group(['prefix' => 'admin', 'as' => 'admin.', 'middleware' => ['admin']],
             Route::get(Dashboard::VIEW[URI], 'index')->name('index');
             Route::post(Dashboard::ORDER_STATUS[URI], 'getOrderStatus')->name('order-status');
             Route::get(Dashboard::EARNING_STATISTICS[URI], 'getEarningStatistics')->name('earning-statistics');
+            Route::get('analytics-data', 'getAnalyticsData')->name('analytics-data');
         });
     });
 
@@ -428,6 +429,7 @@ Route::group(['prefix' => 'admin', 'as' => 'admin.', 'middleware' => ['admin']],
             Route::post(Vendor::WITHDRAW_STATUS[URI] . '/{id}', 'withdrawStatus')->name('withdraw_status');
             Route::get('sign-up-request', 'signUpRequest')->name('sign-up-request');
             Route::get('sign-up-request/export', 'exportSignUpRequestList')->name('sign-up-list-export-excel');
+            Route::delete('delete/{id}', 'delete')->name('delete');
         });
 
         Route::group(['prefix' => 'waiting-list', 'as' => 'waiting-list.'], function () {
@@ -872,11 +874,14 @@ Route::group(['prefix' => 'admin', 'as' => 'admin.', 'middleware' => ['admin']],
         Route::group(['prefix' => 'subscription', 'as' => 'subscription.', 'middleware' => ['module:system_settings']], function () {
             Route::controller(SubscriptionSettingController::class)->group(function () {
                 Route::get(Subscription::INDEX[URI], 'index')->name('index');
+                Route::get('add', 'getAddView')->name('add');
+                Route::post('store', 'store')->name('store');
                 Route::get(Subscription::UPDATE[URI] . '/{id}', 'getUpdateView')->name('update');
                 Route::post(Subscription::UPDATE[URI] . '/{id}', 'update');
                 Route::get('add-billing-type/{id}', 'assignBillingType')->name('billing-type.index');
                 Route::post('add-billing-type', 'storeBillingType')->name('billing-type.store');
                 Route::post('trial-plan', 'updateTrialPlan')->name('trial-plan.update');
+                Route::post('new-vendor-default-plan', 'updateNewVendorDefaultPlan')->name('new-vendor-default-plan.update');
             });
         });
 
@@ -942,6 +947,7 @@ Route::group(['prefix' => 'admin', 'as' => 'admin.', 'middleware' => ['admin']],
                 Route::post(BusinessSettings::COMMISSION_RULES_UPDATE[URI], 'commissionRulesUpdate')->name('update-commission-rules');
                 Route::put(BusinessSettings::COMMISSION_RULES_UPDATE[URI]. '/{id}', 'updateCommissionRule')->name('update-commission-rules.edit');
                 Route::delete(BusinessSettings::COMMISSION_RULES_UPDATE[URI]. '/{id}', 'deleteCommissionRule')->name('update-commission-rules.destroy');
+                Route::patch(BusinessSettings::COMMISSION_RULES_UPDATE[URI]. '/{id}/toggle', 'toggleCommissionRule')->name('update-commission-rules.toggle');
             });
         });
 

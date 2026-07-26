@@ -33,6 +33,26 @@ class SMSModuleController extends BaseController
     {
         $paymentPublishedStatus = config('get_payment_publish_status') ?? 0;
         $paymentGatewayPublishedStatus = isset($paymentPublishedStatus[0]['is_published']) ? $paymentPublishedStatus[0]['is_published'] : 0;
+        $geezExists = $this->settingRepo->getFirstWhere(params: ['key_name' => 'geez_sms', 'settings_type' => 'sms_config']);
+        if (!$geezExists) {
+            $defaultValues = [
+                'gateway' => 'geez_sms',
+                'mode' => 'live',
+                'status' => 0,
+                'token' => '',
+                'otp_template' => 'Your OTP code is #OTP#',
+            ];
+            $this->settingRepo->updateOrInsert(params: ['key_name' => 'geez_sms', 'settings_type' => 'sms_config'], data: [
+                'id' => (string) \Illuminate\Support\Str::uuid(),
+                'key_name' => 'geez_sms',
+                'live_values' => json_encode($defaultValues),
+                'test_values' => json_encode($defaultValues),
+                'settings_type' => 'sms_config',
+                'mode' => 'live',
+                'is_active' => 0,
+            ]);
+        }
+
         $smsGatewaysList = $this->settingRepo->getListWhereIn(
             whereInFilters: ['settings_type' => ['sms_config'], 'key_name' => GlobalConstant::DEFAULT_SMS_GATEWAYS],
             dataLimit: 'all',
@@ -48,30 +68,29 @@ class SMSModuleController extends BaseController
 
     public function update(SMSModuleUpdateRequest $request): RedirectResponse
     {
+        $gateway = 'geez_sms';
+        $keep = $this->settingRepo->getFirstWhere(params: ['key_name' => $gateway, 'settings_type' => 'sms_config']);
 
-        foreach (['releans', 'twilio', 'nexmo', '2factor', 'msg91', 'hubtel', 'paradox', 'signal_wire', '019_sms', 'viatech', 'global_sms', 'akandit_sms', 'sms_to', 'alphanet_sms'] as $gateway) {
-            $keep = $this->settingRepo->getFirstWhere(params: ['key_name' => $gateway, 'settings_type' => 'sms_config']);
-            if (isset($keep)) {
-                $hold = $keep['live_values'];
-                if ($request['gateway'] != $gateway) {
-                    $hold['status'] = 0;
-                    $this->settingRepo->updateWhere(params: ['key_name' => $gateway, 'settings_type' => 'sms_config'], data: [
-                        'live_values' => $hold,
-                        'test_values' => $hold,
-                        'is_active' => 0,
-                    ]);
-                } else {
-                    $hold['status'] = $request->get('status', 0);
-                    $this->settingRepo->updateOrInsert(params: ['key_name' => $request['gateway'], 'settings_type' => 'sms_config'], data: [
-                        'key_name' => $request['gateway'],
-                        'live_values' => $hold,
-                        'test_values' => $hold,
-                        'settings_type' => 'sms_config',
-                        'mode' => $request['mode'],
-                        'is_active' => $request['status'],
-                    ]);
-                }
-            }
+        if ($keep) {
+            // live_values is cast to array by the model
+            $hold = is_array($keep['live_values']) ? $keep['live_values'] : json_decode($keep['live_values'], true);
+
+            // Merge the incoming form values into the existing config
+            $hold['status'] = $request->get('status', 0);
+            $hold['token'] = $request->get('token', $hold['token'] ?? '');
+            $hold['otp_template'] = $request->get('otp_template', $hold['otp_template'] ?? '');
+            $hold['mode'] = $request->get('mode', 'live');
+            $hold['gateway'] = $gateway;
+
+            $this->settingRepo->updateWhere(
+                params: ['key_name' => $gateway, 'settings_type' => 'sms_config'],
+                data: [
+                    'live_values' => json_encode($hold),
+                    'test_values' => json_encode($hold),
+                    'mode' => $request->get('mode', 'live'),
+                    'is_active' => $request->get('status', 0),
+                ]
+            );
         }
 
         Toastr::success(GATEWAYS_DEFAULT_UPDATE_200['message']);

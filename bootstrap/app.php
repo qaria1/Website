@@ -11,6 +11,10 @@
 |
 */
 
+if (!defined('DOMAIN_POINTED_DIRECTORY')) {
+    define('DOMAIN_POINTED_DIRECTORY', 'public');
+}
+
 $app = new Illuminate\Foundation\Application(
     $_ENV['APP_BASE_PATH'] ?? dirname(__DIR__)
 );

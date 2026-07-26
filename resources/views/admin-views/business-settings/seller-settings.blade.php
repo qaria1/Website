@@ -250,13 +250,14 @@
                                 <th>{{ translate('min_price') }}</th>
                                 <th>{{ translate('max_price') }}</th>
                                 <th>{{ translate('commission (%)') }}</th>
+                                <th class="text-center">{{ translate('status') }}</th>
                                 <th class="text-center">{{ translate('action') }}</th>
                             </tr>
                         </thead>
 
                         <tbody>
                             @forelse ($rules as $rule)
-                                <tr>
+                                <tr id="rule-row-{{ $rule->id }}">
                                     <td>
                                         @if ($rule->seller)
                                             {{ $rule->seller->f_name . ' ' . $rule->seller->l_name }}
@@ -266,7 +267,22 @@
                                     </td>
                                     <td>{{ $rule->min_price }}</td>
                                     <td>{{ $rule->max_price ?? '∞' }}</td>
-                                    <td>{{ $rule->commission_percent }}%</td>
+                                    <td>
+                                        <span class="badge {{ $rule->status ? 'badge-success' : 'badge-secondary' }}">
+                                            {{ $rule->commission_percent }}%
+                                        </span>
+                                    </td>
+                                    <td class="text-center">
+                                        {{-- Status Toggle --}}
+                                        <label class="switcher" title="{{ $rule->status ? translate('Disable rule') : translate('Enable rule') }}">
+                                            <input type="checkbox" class="switcher_input commission-toggle"
+                                                id="toggle-{{ $rule->id }}"
+                                                data-id="{{ $rule->id }}"
+                                                data-url="{{ route('admin.business-settings.seller-settings.update-commission-rules.toggle', $rule->id) }}"
+                                                {{ $rule->status ? 'checked' : '' }}>
+                                            <span class="switcher_control"></span>
+                                        </label>
+                                    </td>
                                     <td class="text-center">
                                         <div class="d-flex justify-content-center gap-2">
                                             <a href="javascript:;"
@@ -291,7 +307,7 @@
                                 </tr>
                             @empty
                                 <tr>
-                                    <td colspan="5" class="text-center py-4">
+                                    <td colspan="6" class="text-center py-4">
                                         {{ translate('no_rules_found') }}
                                     </td>
                                 </tr>
@@ -369,6 +385,49 @@
                     const modal = new bootstrap.Modal(document.getElementById(
                         'editCommissionModal'));
                     modal.show();
+                });
+            });
+
+            // Commission Rule Toggle
+            document.querySelectorAll('.commission-toggle').forEach(function(toggle) {
+                toggle.addEventListener('change', function() {
+                    const ruleId = this.dataset.id;
+                    const url = this.dataset.url;
+                    const checkbox = this;
+                    const badgeEl = document.querySelector('#rule-row-' + ruleId + ' .badge');
+
+                    $.ajax({
+                        url: url,
+                        type: 'POST',
+                        data: {
+                            _token: '{{ csrf_token() }}',
+                            _method: 'PATCH',
+                        },
+                        success: function(response) {
+                            if (response.success) {
+                                if (response.status) {
+                                    toastr.success(response.message);
+                                    if (badgeEl) {
+                                        badgeEl.classList.remove('badge-secondary');
+                                        badgeEl.classList.add('badge-success');
+                                    }
+                                    checkbox.closest('label').title = '{{ translate('Disable rule') }}';
+                                } else {
+                                    toastr.warning(response.message);
+                                    if (badgeEl) {
+                                        badgeEl.classList.remove('badge-success');
+                                        badgeEl.classList.add('badge-secondary');
+                                    }
+                                    checkbox.closest('label').title = '{{ translate('Enable rule') }}';
+                                }
+                            }
+                        },
+                        error: function() {
+                            // Revert on error
+                            checkbox.checked = !checkbox.checked;
+                            toastr.error('{{ translate('Failed to update rule status') }}');
+                        }
+                    });
                 });
             });
         });

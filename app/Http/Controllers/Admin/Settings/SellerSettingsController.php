@@ -128,4 +128,18 @@ class SellerSettingsController extends BaseController
         Toastr::success(translate('Updated_successfully'));
         return redirect()->back();
     }
+
+    public function toggleCommissionRule($id)
+    {
+        $rule = CommissionRule::findOrFail($id);
+        $rule->status = $rule->status ? 0 : 1;
+        $rule->save();
+        return response()->json([
+            'success' => true,
+            'status' => $rule->status,
+            'message' => $rule->status
+                ? translate('Commission rule activated')
+                : translate('Commission rule deactivated'),
+        ]);
+    }
 }

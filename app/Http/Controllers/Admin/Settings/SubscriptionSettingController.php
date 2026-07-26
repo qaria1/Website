@@ -37,16 +37,73 @@ class SubscriptionSettingController extends BaseController
     {
         $subscriptionPlans = SubscriptionPlan::with('billingTypes')->get();
 
-        $defaultTrialPlan = BusinessSetting::where('type', 'trial_period')->first()->toArray();
-        $defaultTrialPlan['values'] = json_decode($defaultTrialPlan['value']);
+        $defaultTrialPlanRaw = BusinessSetting::where('type', 'trial_period')->first();
+        $defaultTrialPlan = null;
+        if ($defaultTrialPlanRaw) {
+            $defaultTrialPlan = $defaultTrialPlanRaw->toArray();
+            $defaultTrialPlan['values'] = json_decode($defaultTrialPlan['value']);
+        }
 
-        return view('admin-views.subscription.index', compact('subscriptionPlans', 'defaultTrialPlan'));
+        $newVendorDefaultPlanRaw = BusinessSetting::where('type', 'new_vendor_default_subscription')->first();
+        $newVendorDefaultPlan = null;
+        if ($newVendorDefaultPlanRaw) {
+            $newVendorDefaultPlan = $newVendorDefaultPlanRaw->toArray();
+            $newVendorDefaultPlan['values'] = json_decode($newVendorDefaultPlan['value']);
+        }
+
+        return view('admin-views.subscription.index', compact('subscriptionPlans', 'defaultTrialPlan', 'newVendorDefaultPlan'));
     }
 
     public function getUpdateView(string|int $id): View|RedirectResponse
     {
         $plan = SubscriptionPlan::findOrFail($id);
         return view('admin-views.subscription.update-view', compact('plan'));
+    }
+
+    public function getAddView(): View
+    {
+        $billingTypes = \App\Models\BillingType::all();
+        return view('admin-views.subscription.create', compact('billingTypes'));
+    }
+
+    public function store(Request $request): RedirectResponse
+    {
+        $request->validate([
+            'plan_name'   => 'required|string|max:100',
+            'plan_code'   => 'required|string|max:10',
+            'prices.*'    => 'nullable|numeric|min:0',
+        ]);
+
+        $plan = SubscriptionPlan::create([
+            'name'                  => $request->input('plan_name'),
+            'code'                  => strtoupper($request->input('plan_code')),
+            'slug'                  => \Illuminate\Support\Str::slug($request->input('plan_name')),
+            'max_product_upload'    => $request->input('max_product_upload', 0),
+            'max_product_lifecycle' => $request->input('max_product_lifecycle', 0),
+            'available_vendors'     => $request->input('available_vendors', 0),
+            'is_active'             => true,
+            'status'                => true,
+        ]);
+
+        // Save prices per billing type
+        if ($request->has('prices')) {
+            foreach ($request->input('prices') as $billingTypeId => $price) {
+                if ($price !== null && $price !== '') {
+                    $billingType = \App\Models\BillingType::find($billingTypeId);
+                    if ($billingType) {
+                        \App\Models\PlanBilling::create([
+                            'plan_id'         => $plan->id,
+                            'billing_type_id' => $billingTypeId,
+                            'price'           => $price,
+                            'validity'        => $billingType->duration_in_days,
+                        ]);
+                    }
+                }
+            }
+        }
+
+        Toastr::success(translate('subscription_plan_created_successfully'));
+        return redirect()->route('admin.business-settings.subscription.index');
     }
 
     public function update(Request $request, $id): RedirectResponse
@@ -88,6 +145,27 @@ class SubscriptionSettingController extends BaseController
             Toastr::success(translate('trial_subscription_updated_successfully'));
             return back();
         }
+    }
+
+    public function updateNewVendorDefaultPlan(Request $request): RedirectResponse
+    {
+        $request->validate([
+            'subscription_plan' => 'required|integer',
+            'plan_duration'     => 'required|integer|min:1',
+        ]);
+
+        $value = json_encode([
+            'plan_id'  => $request->input('subscription_plan'),
+            'validity' => $request->input('plan_duration'),
+        ]);
+
+        BusinessSetting::updateOrCreate(
+            ['type' => 'new_vendor_default_subscription'],
+            ['value' => $value, 'updated_at' => now()]
+        );
+
+        Toastr::success(translate('new_vendor_default_subscription_updated_successfully'));
+        return back();
     }
 
     public function assignBillingType($id)

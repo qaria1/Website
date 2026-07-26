@@ -17,6 +17,7 @@ use App\Models\SellerWaitingList;
 use App\Models\SellerSubscription;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Contracts\View\View;
+use App\Utils\ImageManager;
 use Brian2694\Toastr\Facades\Toastr;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Enums\ViewPaths\Admin\Vendor;
@@ -621,5 +622,67 @@ class VendorController extends BaseController
             'inactive' => $inactive,
         ];
         return Excel::download(new SellerSignUpListExport($data), VendorExport::SIGN_UP_EXPORT_XLSX);
+    }
+
+    public function delete($id): RedirectResponse
+    {
+        $seller = Seller::find($id);
+
+        if (!$seller) {
+            Toastr::error(translate('vendor_not_found'));
+            return redirect()->back();
+        }
+
+        DB::transaction(function () use ($seller, $id) {
+            if ($seller->image) {
+                ImageManager::delete('seller/' . $seller->image);
+            }
+
+            $shop = \App\Models\Shop::where('seller_id', $id)->first();
+            if ($shop) {
+                if ($shop->image) {
+                    ImageManager::delete('shop/' . $shop->image);
+                }
+                if ($shop->banner) {
+                    ImageManager::delete('shop/banner/' . $shop->banner);
+                }
+                if ($shop->bottom_banner) {
+                    ImageManager::delete('shop/banner/' . $shop->bottom_banner);
+                }
+                DB::table('shop_followers')->where('shop_id', $shop->id)->delete();
+                $shop->delete();
+            }
+
+            $productIds = \App\Models\Product::where('added_by', 'seller')->where('user_id', $id)->pluck('id')->toArray();
+            if (!empty($productIds)) {
+                DB::table('reviews')->whereIn('product_id', $productIds)->delete();
+                DB::table('wishlists')->whereIn('product_id', $productIds)->delete();
+                DB::table('cart_shippings')->whereIn('cart_id', function($q) use ($productIds) {
+                    $q->select('id')->from('carts')->whereIn('product_id', $productIds);
+                })->delete();
+                DB::table('carts')->whereIn('product_id', $productIds)->delete();
+                DB::table('product_stocks')->whereIn('product_id', $productIds)->delete();
+                DB::table('product_tags')->whereIn('product_id', $productIds)->delete();
+                DB::table('flash_deal_products')->whereIn('product_id', $productIds)->delete();
+                DB::table('deal_of_the_days')->whereIn('product_id', $productIds)->delete();
+                \App\Models\Product::whereIn('id', $productIds)->delete();
+            }
+
+            DB::table('seller_wallets')->where('seller_id', $id)->delete();
+            DB::table('seller_wallet_histories')->where('seller_id', $id)->delete();
+            DB::table('withdraw_requests')->where('seller_id', $id)->delete();
+
+            DB::table('seller_subscriptions')->where('seller_id', $id)->delete();
+            DB::table('subscription_transactions')->where('seller_id', $id)->delete();
+            DB::table('seller_product_counts')->where('seller_id', $id)->delete();
+
+            DB::table('chattings')->where('seller_id', $id)->delete();
+            DB::table('phone_or_email_verifications')->where('phone_or_email', $seller->email)->orWhere('phone_or_email', $seller->phone)->delete();
+
+            $seller->delete();
+        });
+
+        Toastr::success(translate('vendor_deleted_successfully'));
+        return redirect()->back();
     }
 }

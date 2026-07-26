@@ -173,8 +173,8 @@ class SellerProductSaleReportController extends Controller
     public function seller_report_same_year($request, $start_date, $end_date, $from_year, $number, $default_inc)
     {
         $orders = self::seller_report_chart_common_query($request, $start_date, $end_date)
-            ->selectRaw('sum(order_amount) as order_amount, YEAR(updated_at) year, MONTH(updated_at) month')
-            ->groupBy(DB::raw("DATE_FORMAT(updated_at, '%M')"))
+            ->selectRaw("sum(order_amount) as order_amount, CAST(strftime('%Y', updated_at) AS INTEGER) year, CAST(strftime('%m', updated_at) AS INTEGER) month")
+            ->groupBy(DB::raw("strftime('%m', updated_at)"))
             ->latest('updated_at')->get();
 
         for ($inc = $default_inc; $inc <= $number; $inc++) {
@@ -198,8 +198,8 @@ class SellerProductSaleReportController extends Controller
         $month = date("F", strtotime("$year_month"));
 
         $orders = self::seller_report_chart_common_query($request, $start_date, $end_date)
-            ->selectRaw('sum(order_amount) as order_amount, YEAR(updated_at) year, MONTH(updated_at) month, DAY(updated_at) day')
-            ->groupBy(DB::raw("DATE_FORMAT(updated_at, '%D')"))
+            ->selectRaw("sum(order_amount) as order_amount, CAST(strftime('%Y', updated_at) AS INTEGER) year, CAST(strftime('%m', updated_at) AS INTEGER) month, DAY(updated_at) day")
+            ->groupBy(DB::raw("strftime('%d', updated_at)"))
             ->latest('updated_at')->get();
 
         for ($inc = $default_inc; $inc <= $number; $inc++) {
@@ -232,9 +232,9 @@ class SellerProductSaleReportController extends Controller
         $orders = self::seller_report_chart_common_query($request, $start_date, $end_date)
             ->select(
                 DB::raw('sum(order_amount) as order_amount'),
-                DB::raw("(DATE_FORMAT(updated_at, '%W')) as day")
+                DB::raw("(CASE strftime('%w', updated_at) WHEN '0' THEN 'Sunday' WHEN '1' THEN 'Monday' WHEN '2' THEN 'Tuesday' WHEN '3' THEN 'Wednesday' WHEN '4' THEN 'Thursday' WHEN '5' THEN 'Friday' WHEN '6' THEN 'Saturday' END) as day")
             )
-            ->groupBy(DB::raw("DATE_FORMAT(updated_at, '%D')"))
+            ->groupBy(DB::raw("strftime('%d', updated_at)"))
             ->latest('updated_at')->get();
 
         for ($inc = 0; $inc <= $number; $inc++) {
@@ -254,8 +254,8 @@ class SellerProductSaleReportController extends Controller
     public function seller_report_different_year($request, $start_date, $end_date, $from_year, $to_year)
     {
         $orders = self::seller_report_chart_common_query($request, $start_date, $end_date)
-            ->selectRaw('sum(order_amount) as order_amount, YEAR(updated_at) year')
-            ->groupBy(DB::raw("DATE_FORMAT(updated_at, '%Y')"))
+            ->selectRaw("sum(order_amount) as order_amount, CAST(strftime('%Y', updated_at) AS INTEGER) year")
+            ->groupBy(DB::raw("strftime('%Y', updated_at)"))
             ->latest('updated_at')->get();
 
         for ($inc = $from_year; $inc <= $to_year; $inc++) {

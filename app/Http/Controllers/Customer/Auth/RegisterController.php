@@ -6,6 +6,7 @@ use App\Events\EmailVerificationEvent;
 use App\Http\Controllers\Controller;
 use App\Models\BusinessSetting;
 use App\Models\PhoneOrEmailVerification;
+use App\Models\Seller;
 use App\Models\Wishlist;
 use App\User;
 use App\Utils\CartManager;
@@ -98,11 +99,12 @@ class RegisterController extends Controller
             'referred_by' => (isset($refer_user) && $refer_user) ? $refer_user->id : null,
         ]);
 
-        // fixing chat feature
+        // fixing chat feature - provide attachment as valid JSON to satisfy json_valid() CHECK constraint
         \App\Models\Chatting::create([
             'user_id' => $user->id,
             'admin_id' => 0,
-            'message' => 'Hey ' . $user->f_name . ' ' . $user->l_name . ', Welcome to ' . env('APP_NAME') ?? ' our Platform!',
+            'message' => 'Hey ' . $user->f_name . ' ' . $user->l_name . ', Welcome to ' . (env('APP_NAME') ?? 'our Platform!'),
+            'attachment' => json_encode([]),
             'sent_by_admin' => 1,
         ]);
 
@@ -223,10 +225,24 @@ class RegisterController extends Controller
         $email_verification = Helpers::get_business_settings('email_verification');
 
         $user = User::find($id);
-        if($phone_verification){
-            $user_verify = $user->is_phone_verified == 1 ? 1 : 0;
-        }elseif($email_verification){
-            $user_verify = $user->is_email_verified == 1 ? 1 : 0;
+        $is_seller = false;
+        if (!$user) {
+            $user = Seller::find($id);
+            $is_seller = true;
+        }
+
+        if (!$user) {
+            Toastr::error(translate('account_not_found'));
+            return redirect(route('customer.auth.login'));
+        }
+
+        $user_verify = 0;
+        if (!$is_seller) {
+            if($phone_verification){
+                $user_verify = $user->is_phone_verified == 1 ? 1 : 0;
+            }elseif($email_verification){
+                $user_verify = $user->is_email_verified == 1 ? 1 : 0;
+            }
         }
 
         $token = PhoneOrEmailVerification::where('phone_or_email','=',$user['email'])->first();
@@ -242,7 +258,7 @@ class RegisterController extends Controller
         return view(VIEW_FILE_NAMES['customer_auth_verify'], compact('user','user_verify','get_time'));
     }
 
-    // Customer Default Verify
+    // Customer / Vendor Default Verify
     public static function verify(Request $request)
     {
         Validator::make($request->all(), [
@@ -253,6 +269,17 @@ class RegisterController extends Controller
         $phone_status = Helpers::get_business_settings('phone_verification');
 
         $user = User::find($request->id);
+        $is_seller = false;
+        if (!$user) {
+            $user = Seller::find($request->id);
+            $is_seller = true;
+        }
+
+        if (!$user) {
+            Toastr::error(translate('account_not_found'));
+            return redirect()->back();
+        }
+
         $verify = PhoneOrEmailVerification::where(['phone_or_email' => $user['email'], 'token' => $request['token']])->first();
 
         $max_otp_hit = Helpers::get_business_settings('maximum_otp_hit') ?? 5;
@@ -266,12 +293,19 @@ class RegisterController extends Controller
                 return redirect()->back();
             }
 
-            ($email_status == 1 || ($phone_status == '0' && $email_status == '0')) ? ($user->is_email_verified = 1) : ($user->is_phone_verified = 1);
-            $user->save();
-            $verify->delete();
+            if ($is_seller) {
+                $verify->delete();
+                Toastr::success(translate('phone_number_verified_successfully'));
+                Toastr::info(translate('wait_for_your_request_to_be_approved'), '', ['timeOut' => 10000]);
+                return redirect(route('home'));
+            } else {
+                ($email_status == 1 || ($phone_status == '0' && $email_status == '0')) ? ($user->is_email_verified = 1) : ($user->is_phone_verified = 1);
+                $user->save();
+                $verify->delete();
 
-            Toastr::success(translate('verification_done_successfully'));
-            return redirect(route('customer.auth.login'));
+                Toastr::success(translate('verification_done_successfully'));
+                return redirect(route('customer.auth.login'));
+            }
 
         }else{
             $verification = PhoneOrEmailVerification::where(['phone_or_email' => $user['email']])->first();
@@ -421,6 +455,14 @@ class RegisterController extends Controller
     public static function resend_otp(Request $request)
     {
         $user = User::find($request->user_id);
+        if (!$user) {
+            $user = Seller::find($request->user_id);
+        }
+
+        if (!$user) {
+            return response()->json(['status' => '0']);
+        }
+
         $token = PhoneOrEmailVerification::where('phone_or_email','=', $user['email'])->first();
         $otp_resend_time = Helpers::get_business_settings('otp_resend_time') > 0 ? Helpers::get_business_settings('otp_resend_time') : 0;
 

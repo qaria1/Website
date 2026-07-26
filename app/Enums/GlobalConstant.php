@@ -1182,11 +1182,7 @@ enum GlobalConstant{
     ];
 
     const DEFAULT_SMS_GATEWAYS = [
-        'twilio',
-        'nexmo',
-        '2factor',
-        'msg91',
-        'releans',
+        'geez_sms',
     ];
 
 

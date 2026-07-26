@@ -29,7 +29,7 @@ class PaymentConfigProvider extends ServiceProvider
 
         try {
             $data = BusinessSetting::where(['type' => 'paypal'])->first();
-            $paypal = json_decode($data['value'], true);
+            $paypal = json_decode($data['value'] ?? null, true);
             if ($paypal) {
                 $mode = $paypal['environment']??'sandbox';
                 if ($mode == 'live') {
@@ -87,7 +87,7 @@ class PaymentConfigProvider extends ServiceProvider
             }*/
 
             $data = BusinessSetting::where(['type' => 'razor_pay'])->first();
-            $razor = json_decode($data['value'], true);
+            $razor = json_decode($data['value'] ?? null, true);
             if ($razor) {
                 $config = array(
                     'razor_key' => env('RAZOR_KEY', $razor['razor_key']),
@@ -97,7 +97,7 @@ class PaymentConfigProvider extends ServiceProvider
             }
 
             $data = BusinessSetting::where(['type' => 'paystack'])->first();
-            $paystack = json_decode($data['value'], true);
+            $paystack = json_decode($data['value'] ?? null, true);
             if ($paystack) {
                 $config = array(
                     'publicKey' => env('PAYSTACK_PUBLIC_KEY', $paystack['publicKey']),
@@ -109,7 +109,7 @@ class PaymentConfigProvider extends ServiceProvider
             }
 
             $data = BusinessSetting::where(['type' => 'flutterwave'])->first();
-            $flutterwave = json_decode($data['value'], true);
+            $flutterwave = json_decode($data['value'] ?? null, true);
             if ($flutterwave) {
                 $config = array(
                     'publicKey' => env('FLW_PUBLIC_KEY', $flutterwave['public_key']), // values : (local | production)
@@ -122,7 +122,10 @@ class PaymentConfigProvider extends ServiceProvider
 
             //paytm
             $paytm = Helpers::get_business_settings('paytm');
-            if (isset($paytm)) {
+            if (is_string($paytm)) {
+                $paytm = json_decode($paytm, true);
+            }
+            if (isset($paytm) && is_array($paytm)) {
 
                 $PAYTM_STATUS_QUERY_NEW_URL='https://securegw-stage.paytm.in/merchant-status/getTxnStatus';
                 $PAYTM_TXN_URL='https://securegw-stage.paytm.in/theia/processTransaction';

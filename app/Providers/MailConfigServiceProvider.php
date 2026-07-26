@@ -27,10 +27,16 @@ class MailConfigServiceProvider extends ServiceProvider
     {
         try {
             $emailServices_smtp = Helpers::get_business_settings('mail_config');
-            if ($emailServices_smtp['status'] == 0) {
-                $emailServices_smtp = Helpers::get_business_settings('mail_config_sendgrid');
+            if (!is_array($emailServices_smtp)) {
+                return;
             }
-            if ($emailServices_smtp['status'] == 1) {
+            if (($emailServices_smtp['status'] ?? 0) == 0) {
+                $emailServices_smtp = Helpers::get_business_settings('mail_config_sendgrid');
+                if (!is_array($emailServices_smtp)) {
+                    return;
+                }
+            }
+            if (($emailServices_smtp['status'] ?? 0) == 1) {
                 $config = array(
                     'driver' => $emailServices_smtp['driver'],
                     'host' => $emailServices_smtp['host'],

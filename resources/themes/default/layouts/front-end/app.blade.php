@@ -8,27 +8,27 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="apple-touch-icon" sizes="180x180" href="{{asset('storage/app/public/company')}}/{{$web_config['fav_icon']->value}}">
     <link rel="icon" type="image/png" sizes="32x32" href="{{asset('storage/app/public/company')}}/{{$web_config['fav_icon']->value}}">
-    <link rel="stylesheet" media="screen" href="{{ asset('public/assets/front-end/vendor/simplebar/dist/simplebar.min.css') }}">
-    <link rel="stylesheet" media="screen" href="{{ asset('public/assets/front-end/vendor/tiny-slider/dist/tiny-slider.css') }}">
-    <link rel="stylesheet" media="screen" href="{{ asset('public/assets/front-end/vendor/drift-zoom/dist/drift-basic.min.css') }}">
-    <link rel="stylesheet" media="screen" href="{{ asset('public/assets/front-end/vendor/lightgallery.js/dist/css/lightgallery.min.css') }}">
-    <link rel="stylesheet" media="screen" href="{{ asset('public/assets/front-end/css/theme.css') }}">
-    <link rel="stylesheet" media="screen" href="{{ asset('public/assets/front-end/css/slick.css') }}">
-    <link rel="stylesheet" href="{{ asset('public/assets/front-end/css/font-awesome.min.css') }}">
-    <link rel="stylesheet" href="{{ asset('public/assets/back-end/css/toastr.css') }}" />
-    <link rel="stylesheet" href="{{ asset('public/assets/front-end/css/master.css') }}" />
-    <link rel="stylesheet" href="{{ asset('public/assets/front-end/css/roboto-font.css') }}">
-    <link rel="stylesheet" href="{{ asset('public/css/lightbox.css') }}">
-    <link rel="stylesheet" href="{{ asset('public/assets/back-end/vendor/icon-set/style.css') }}">
-    <link rel="stylesheet" href="{{ asset('public/assets/back-end/css/style.css') }}">
+    <link rel="stylesheet" media="screen" href="{{ dynamicAsset('public/assets/front-end/vendor/simplebar/dist/simplebar.min.css') }}">
+    <link rel="stylesheet" media="screen" href="{{ dynamicAsset('public/assets/front-end/vendor/tiny-slider/dist/tiny-slider.css') }}">
+    <link rel="stylesheet" media="screen" href="{{ dynamicAsset('public/assets/front-end/vendor/drift-zoom/dist/drift-basic.min.css') }}">
+    <link rel="stylesheet" media="screen" href="{{ dynamicAsset('public/assets/front-end/vendor/lightgallery.js/dist/css/lightgallery.min.css') }}">
+    <link rel="stylesheet" media="screen" href="{{ dynamicAsset('public/assets/front-end/css/theme.css') }}">
+    <link rel="stylesheet" media="screen" href="{{ dynamicAsset('public/assets/front-end/css/slick.css') }}">
+    <link rel="stylesheet" href="{{ dynamicAsset('public/assets/front-end/css/font-awesome.min.css') }}">
+    <link rel="stylesheet" href="{{ dynamicAsset('public/assets/back-end/css/toastr.css') }}" />
+    <link rel="stylesheet" href="{{ dynamicAsset('public/assets/front-end/css/master.css') }}" />
+    <link rel="stylesheet" href="{{ dynamicAsset('public/assets/front-end/css/roboto-font.css') }}">
+    <link rel="stylesheet" href="{{ dynamicAsset('public/css/lightbox.css') }}">
+    <link rel="stylesheet" href="{{ dynamicAsset('public/assets/back-end/vendor/icon-set/style.css') }}">
+    <link rel="stylesheet" href="{{ dynamicAsset('public/assets/back-end/css/style.css') }}">
 
 
     @stack('css_or_js')
 
-    <link rel="stylesheet" href="{{ asset('public/assets/front-end/css/home.css') }}" />
-    <link rel="stylesheet" href="{{ asset('public/assets/front-end/css/responsive1.css') }}" />
+    <link rel="stylesheet" href="{{ dynamicAsset('public/assets/front-end/css/home.css') }}" />
+    <link rel="stylesheet" href="{{ dynamicAsset('public/assets/front-end/css/responsive1.css') }}" />
 
-    <link rel="stylesheet" href="{{ asset('public/assets/front-end/css/style.css') }}">
+    <link rel="stylesheet" href="{{ dynamicAsset('public/assets/front-end/css/style.css') }}">
 
     <style>
         :root {
@@ -55,7 +55,24 @@
         }
     </style>
 
-    <link rel="stylesheet" href="{{ asset('public/assets/front-end/css/custom.css') }}">
+    <link rel="stylesheet" href="{{ dynamicAsset('public/assets/front-end/css/custom.css') }}">
+    <script src="{{ dynamicAsset('public/assets/front-end/vendor/jquery/dist/jquery-2.2.4.min.js') }}"></script>
+    <script src="{{ dynamicAsset('public/assets/front-end/vendor/bootstrap/dist/js/bootstrap.bundle.min.js') }}"></script>
+    <script src="{{ dynamicAsset('public/assets/front-end/vendor/bs-custom-file-input/dist/bs-custom-file-input.min.js') }}">
+    </script>
+    <script src="{{ dynamicAsset('public/assets/front-end/vendor/simplebar/dist/simplebar.min.js') }}"></script>
+    <script src="{{ dynamicAsset('public/assets/front-end/vendor/tiny-slider/dist/min/tiny-slider.js') }}"></script>
+    <script src="{{ dynamicAsset('public/assets/front-end/vendor/smooth-scroll/dist/smooth-scroll.polyfills.min.js') }}"></script>
+    <script src="{{ dynamicAsset('public/js/lightbox.min.js') }}"></script>
+    <script src="{{ dynamicAsset('public/assets/front-end/vendor/drift-zoom/dist/Drift.min.js') }}"></script>
+    <script src="{{ dynamicAsset('public/assets/front-end/vendor/lightgallery.js/dist/js/lightgallery.min.js') }}"></script>
+    <script src="{{ dynamicAsset('public/assets/front-end/vendor/lg-video.js/dist/lg-video.min.js') }}"></script>
+    <script src="{{ dynamicAsset('public/assets/back-end/js/toastr.js') }}"></script>
+    <script src="{{ dynamicAsset('public/assets/front-end/js/theme.js') }}"></script>
+    <script src="{{ dynamicAsset('public/assets/front-end/js/slick.js') }}"></script>
+    <script src="{{ dynamicAsset('public/assets/front-end/js/sweet_alert.js') }}"></script>
+    <script src="{{ dynamicAsset('public/assets/back-end/js/toastr.js') }}"></script>
+    <script src="{{ dynamicAsset('public/assets/front-end/js/custom.js') }}"></script>
 
     @php($google_tag_manager_id = getWebConfig(name: 'google_tag_manager_id'))
     @if ($google_tag_manager_id)
@@ -208,7 +225,7 @@
         @if (isset($whatsapp['status']) && $whatsapp['status'] == 1)
             <div class="wa-widget-send-button">
                 <a href="https://wa.me/{{ $whatsapp['phone'] }}?text=Hello%20there!" target="_blank">
-                    <img src="{{ asset('public/assets/front-end/img/whatsapp.svg') }}"
+                    <img src="{{ dynamicAsset('public/assets/front-end/img/whatsapp.svg') }}"
                         class="wa-messenger-svg-whatsapp wh-svg-icon"
                         alt="{{ translate('Chat_with_us_on_WhatsApp') }}">
                 </a>
@@ -216,23 +233,23 @@
         @endif
     </div>
 
-    <script src="{{ asset('public/assets/front-end/vendor/jquery/dist/jquery-2.2.4.min.js') }}"></script>
-    <script src="{{ asset('public/assets/front-end/vendor/bootstrap/dist/js/bootstrap.bundle.min.js') }}"></script>
-    <script src="{{ asset('public/assets/front-end/vendor/bs-custom-file-input/dist/bs-custom-file-input.min.js') }}">
+    <script src="{{ dynamicAsset('public/assets/front-end/vendor/jquery/dist/jquery-2.2.4.min.js') }}"></script>
+    <script src="{{ dynamicAsset('public/assets/front-end/vendor/bootstrap/dist/js/bootstrap.bundle.min.js') }}"></script>
+    <script src="{{ dynamicAsset('public/assets/front-end/vendor/bs-custom-file-input/dist/bs-custom-file-input.min.js') }}">
     </script>
-    <script src="{{ asset('public/assets/front-end/vendor/simplebar/dist/simplebar.min.js') }}"></script>
-    <script src="{{ asset('public/assets/front-end/vendor/tiny-slider/dist/min/tiny-slider.js') }}"></script>
-    <script src="{{ asset('public/assets/front-end/vendor/smooth-scroll/dist/smooth-scroll.polyfills.min.js') }}"></script>
-    <script src="{{ asset('public/js/lightbox.min.js') }}"></script>
-    <script src="{{ asset('public/assets/front-end/vendor/drift-zoom/dist/Drift.min.js') }}"></script>
-    <script src="{{ asset('public/assets/front-end/vendor/lightgallery.js/dist/js/lightgallery.min.js') }}"></script>
-    <script src="{{ asset('public/assets/front-end/vendor/lg-video.js/dist/lg-video.min.js') }}"></script>
-    <script src="{{ asset('public/assets/back-end/js/toastr.js') }}"></script>
-    <script src="{{ asset('public/assets/front-end/js/theme.js') }}"></script>
-    <script src="{{ asset('public/assets/front-end/js/slick.js') }}"></script>
-    <script src="{{ asset('public/assets/front-end/js/sweet_alert.js') }}"></script>
-    <script src="{{ asset('public/assets/back-end/js/toastr.js') }}"></script>
-    <script src="{{ asset('public/assets/front-end/js/custom.js') }}"></script>
+    <script src="{{ dynamicAsset('public/assets/front-end/vendor/simplebar/dist/simplebar.min.js') }}"></script>
+    <script src="{{ dynamicAsset('public/assets/front-end/vendor/tiny-slider/dist/min/tiny-slider.js') }}"></script>
+    <script src="{{ dynamicAsset('public/assets/front-end/vendor/smooth-scroll/dist/smooth-scroll.polyfills.min.js') }}"></script>
+    <script src="{{ dynamicAsset('public/js/lightbox.min.js') }}"></script>
+    <script src="{{ dynamicAsset('public/assets/front-end/vendor/drift-zoom/dist/Drift.min.js') }}"></script>
+    <script src="{{ dynamicAsset('public/assets/front-end/vendor/lightgallery.js/dist/js/lightgallery.min.js') }}"></script>
+    <script src="{{ dynamicAsset('public/assets/front-end/vendor/lg-video.js/dist/lg-video.min.js') }}"></script>
+    <script src="{{ dynamicAsset('public/assets/back-end/js/toastr.js') }}"></script>
+    <script src="{{ dynamicAsset('public/assets/front-end/js/theme.js') }}"></script>
+    <script src="{{ dynamicAsset('public/assets/front-end/js/slick.js') }}"></script>
+    <script src="{{ dynamicAsset('public/assets/front-end/js/sweet_alert.js') }}"></script>
+    <script src="{{ dynamicAsset('public/assets/back-end/js/toastr.js') }}"></script>
+    <script src="{{ dynamicAsset('public/assets/front-end/js/custom.js') }}"></script>
 
     {!! Toastr::message() !!}
 

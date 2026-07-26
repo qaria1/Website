@@ -1082,7 +1082,7 @@ class WebController extends Controller
 
     public function viewWishlist(Request $request): View
     {
-        $brand_setting = BusinessSetting::where('type', 'product_brand')->first()->value;
+        $brand_setting = BusinessSetting::where('type', 'product_brand')->first()?->value ?? 1;
 
         $wishlists = Wishlist::with([
             'productFullInfo',
@@ -1155,7 +1155,7 @@ class WebController extends Controller
         $this->wishlist->where(['product_id' => $request['id'], 'customer_id' => auth('customer')->id()])->delete();
         $data = translate('product_has_been_remove_from_wishlist') . '!';
         $wishlists = $this->wishlist->where('customer_id', auth('customer')->id())->paginate(15);
-        $brand_setting = BusinessSetting::where('type', 'product_brand')->first()->value;
+        $brand_setting = BusinessSetting::where('type', 'product_brand')->first()?->value ?? 1;
         session()->put('wish_list', $this->wishlist->where('customer_id', auth('customer')->user()->id)->pluck('product_id')->toArray());
         return response()->json([
             'success' => $data,

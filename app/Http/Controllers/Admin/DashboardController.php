@@ -23,6 +23,7 @@ use App\Contracts\Repositories\DeliveryManRepositoryInterface;
 use App\Contracts\Repositories\OrderDetailRepositoryInterface;
 use App\Contracts\Repositories\VendorWalletRepositoryInterface;
 use App\Contracts\Repositories\OrderTransactionRepositoryInterface;
+use App\Services\AnalyticsService;
 
 class DashboardController extends BaseController
 {
@@ -37,6 +38,7 @@ class DashboardController extends BaseController
         private readonly BrandRepositoryInterface            $brandRepo,
         private readonly VendorRepositoryInterface           $vendorRepo,
         private readonly VendorWalletRepositoryInterface     $vendorWalletRepo,
+        private readonly AnalyticsService                    $analyticsService,
     )
     {
     }
@@ -97,7 +99,47 @@ class DashboardController extends BaseController
             'total_tax_collected' => $admin_wallet['total_tax_collected'] ?? 0,
         ];
 
-        return view(Dashboard::VIEW[VIEW], compact('data', 'inhouseEarningStatisticsData', 'sellerEarningStatisticsData', 'commissionEarningStatisticsData', 'subscriptionEarningStatisticsData'));
+        // Comprehensive Analytics Service Data
+        $analytics = [
+            'global' => $this->analyticsService->getGlobalSummary(),
+            'financial' => $this->analyticsService->getFinancialAnalytics(),
+            'order' => $this->analyticsService->getOrderAnalytics(),
+            'vendor' => $this->analyticsService->getVendorAnalytics(),
+            'customer' => $this->analyticsService->getCustomerAnalytics(),
+            'product' => $this->analyticsService->getProductAnalytics(),
+            'delivery' => $this->analyticsService->getDeliveryAnalytics(),
+            'refund_support' => $this->analyticsService->getRefundSupportAnalytics(),
+            'activity_alerts' => $this->analyticsService->getActivityAndAlerts(),
+        ];
+
+        return view(Dashboard::VIEW[VIEW], compact(
+            'data',
+            'inhouseEarningStatisticsData',
+            'sellerEarningStatisticsData',
+            'commissionEarningStatisticsData',
+            'subscriptionEarningStatisticsData',
+            'analytics'
+        ));
+    }
+
+    public function getAnalyticsData(Request $request): JsonResponse
+    {
+        $from = $request->input('from');
+        $to = $request->input('to');
+        $groupBy = $request->input('group_by', 'month');
+        $dateRange = ($from && $to) ? ['from' => $from, 'to' => $to] : [];
+
+        return response()->json([
+            'global' => $this->analyticsService->getGlobalSummary($dateRange),
+            'financial' => $this->analyticsService->getFinancialAnalytics($dateRange, $groupBy),
+            'order' => $this->analyticsService->getOrderAnalytics($dateRange, $groupBy),
+            'vendor' => $this->analyticsService->getVendorAnalytics($dateRange),
+            'customer' => $this->analyticsService->getCustomerAnalytics($dateRange),
+            'product' => $this->analyticsService->getProductAnalytics($dateRange),
+            'delivery' => $this->analyticsService->getDeliveryAnalytics(),
+            'refund_support' => $this->analyticsService->getRefundSupportAnalytics(),
+            'activity_alerts' => $this->analyticsService->getActivityAndAlerts(),
+        ]);
     }
 
     public function getOrderStatus(Request $request): JsonResponse

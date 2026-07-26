@@ -201,12 +201,16 @@ class Helpers
         if (in_array($name, $check) == true && session()->has($name)) {
             $config = session($name);
         } else {
-            $data = BusinessSetting::where(['type' => $name])->first();
-            if (isset($data)) {
-                $config = json_decode($data['value'], true);
-                if (is_null($config)) {
-                    $config = $data['value'];
+            try {
+                $data = BusinessSetting::where(['type' => $name])->first();
+                if (isset($data)) {
+                    $config = json_decode($data['value'], true);
+                    if (is_null($config)) {
+                        $config = $data['value'];
+                    }
                 }
+            } catch (\Throwable $e) {
+                $config = null;
             }
 
             if (in_array($name, $check) == true) {
@@ -357,6 +361,7 @@ class Helpers
             '2factor',
             'msg91',
             'releans',
+            'geez_sms',
         ];
         return $methods;
     }
@@ -971,6 +976,7 @@ class Helpers
 
             if ($seller) {
                 $rule = CommissionRule::where('seller_id', $seller)
+                    ->where('status', 1)
                     ->where('min_price', '<=', $order_total)
                     ->where(function ($q) use ($order_total) {
                         $q->where('max_price', '>=', $order_total)
@@ -983,6 +989,7 @@ class Helpers
                     $commission = $rule->commission_percent;
                 } else {
                     $rule = CommissionRule::whereNull('seller_id')
+                        ->where('status', 1)
                         ->where('min_price', '<=', $order_total)
                         ->where(function ($q) use ($order_total) {
                             $q->where('max_price', '>=', $order_total)
@@ -1562,6 +1569,7 @@ if (!function_exists('getCommissionPercent')) {
     {
         if ($sellerId) {
             $rule = CommissionRule::where('seller_id', $sellerId)
+                ->where('status', 1)
                 ->where('min_price', '<=', $price)
                 ->where(function ($q) use ($price) {
                     $q->where('max_price', '>=', $price)
@@ -1576,6 +1584,7 @@ if (!function_exists('getCommissionPercent')) {
         }
 
         $rule = CommissionRule::whereNull('seller_id')
+            ->where('status', 1)
             ->where('min_price', '<=', $price)
             ->where(function ($q) use ($price) {
                 $q->where('max_price', '>=', $price)

@@ -214,7 +214,16 @@
                                                 href="{{route('admin.sellers.view',$seller->id)}}">
                                                 <i class="tio-invisible"></i>
                                             </a>
+                                            <a title="{{translate('delete')}}"
+                                                class="btn btn-outline-danger btn-sm delete square-btn delete-data"
+                                                href="javascript:" data-id="vendor-{{ $seller['id'] }}">
+                                                <i class="tio-delete"></i>
+                                            </a>
                                         </div>
+                                        <form action="{{ route('admin.sellers.delete', [$seller['id']]) }}" method="post"
+                                            id="vendor-{{ $seller['id'] }}">
+                                            @csrf @method('delete')
+                                        </form>
                                     </td>
                                 </tr>
                             @endforeach

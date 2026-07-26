@@ -11,6 +11,12 @@ class SMS_module
 {
     public static function send($receiver, $otp)
     {
+        $config = self::get_settings('geez_sms');
+        if (isset($config) && $config['status'] == 1) {
+            $response = self::geez_sms($receiver, $otp);
+            return $response;
+        }
+
         $config = self::get_settings('twilio');
         if (isset($config) && $config['status'] == 1) {
             return self::twilio($receiver, $otp);
@@ -191,6 +197,46 @@ class SMS_module
                 $response = 'error';
             }
 
+        }
+        return $response;
+    }
+
+    public static function geez_sms($receiver, $otp)
+    {
+        $config = self::get_settings('geez_sms');
+        $response = 'error';
+        if (isset($config) && $config['status'] == 1) {
+            $token = $config['token'] ?? '';
+            $message = isset($config['otp_template']) ? str_replace("#OTP#", $otp, $config['otp_template']) : $otp;
+            try {
+                $curl = curl_init();
+                curl_setopt_array($curl, array(
+                    CURLOPT_URL => 'https://api.geezsms.com/api/v1/sms/send',
+                    CURLOPT_RETURNTRANSFER => true,
+                    CURLOPT_ENCODING => '',
+                    CURLOPT_MAXREDIRS => 10,
+                    CURLOPT_TIMEOUT => 30,
+                    CURLOPT_FOLLOWLOCATION => true,
+                    CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+                    CURLOPT_CUSTOMREQUEST => 'POST',
+                    CURLOPT_POSTFIELDS => http_build_query(array(
+                        'token' => $token,
+                        'phone' => $receiver,
+                        'msg' => $message
+                    )),
+                ));
+                $res = curl_exec($curl);
+                $err = curl_error($curl);
+                curl_close($curl);
+
+                if (!$err) {
+                    $response = 'success';
+                } else {
+                    $response = 'error';
+                }
+            } catch (\Exception $exception) {
+                $response = 'error';
+            }
         }
         return $response;
     }

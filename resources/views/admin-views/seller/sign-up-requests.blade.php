@@ -207,6 +207,15 @@
                                                 <button type="submit"
                                                     class="btn btn-success">{{ translate('approve_vendor') }}</button>
                                             </form>
+                                            <a title="{{ translate('delete') }}"
+                                                class="btn btn-outline-danger btn-sm delete square-btn delete-data"
+                                                href="javascript:" data-id="vendor-req-{{ $seller['id'] }}">
+                                                <i class="tio-delete"></i>
+                                            </a>
+                                            <form action="{{ route('admin.sellers.delete', [$seller['id']]) }}" method="post"
+                                                id="vendor-req-{{ $seller['id'] }}">
+                                                @csrf @method('delete')
+                                            </form>
                                         </div>
                                     </td>
                                 </tr>
